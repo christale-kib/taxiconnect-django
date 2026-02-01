@@ -1,0 +1,19 @@
+# env / secrets
+.env
+.env.*
+*.pem
+*.key
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+# django
+db.sqlite3
+staticfiles/
+media/
+# node / misc
+node_modules/
+.DS_Store

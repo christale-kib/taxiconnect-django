@@ -1,0 +1,5 @@
+Django==5.0.*
+PyMySQL==1.1.*
+django-environ==0.11.*
+gunicorn==22.*
+whitenoise==6.*
