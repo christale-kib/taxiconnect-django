@@ -55,6 +55,7 @@ class Chauffeurs(models.Model):
     station = models.ForeignKey('Stations', models.DO_NOTHING, blank=True, null=True)
     nom = models.CharField(max_length=100)
     prenom = models.CharField(max_length=100)
+    adresse = models.CharField(max_length=255, blank=True, null=True)
     telephone = models.CharField(unique=True, max_length=20)
     email = models.CharField(max_length=255, blank=True, null=True)
     vehicule_immatriculation = models.CharField(unique=True, max_length=50)
