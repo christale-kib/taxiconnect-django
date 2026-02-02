@@ -1,3 +1,4 @@
+import re
 from django.utils import timezone
 from django.db.models import Sum, Q
 from django.db import IntegrityError
@@ -9,6 +10,50 @@ from .models_legacy import (
     Challenges,
     Stations,
 )
+
+
+
+
+ZONES = [
+    "Brazzaville",
+    "Pointe-Noire",
+    "Dolisie",
+    "N'kayi",
+    "Madingou",
+    "Oyo",
+    "Ouesso",
+]
+
+
+def get_zones():
+    return ZONES
+
+
+    return station
+def get_or_create_station_for_zone(zone: str):
+    zone = (zone or "").strip()
+    if zone not in ZONES:
+        raise ValueError("Zone invalide.")
+    station = Stations.objects.filter(nom=zone).order_by("id").first()
+    if station:
+        return station
+    return Stations.objects.create(
+        nom=zone,
+        ville=zone,
+        actif=1,
+        created_at=timezone.now(),
+        updated_at=timezone.now(),
+    )
+
+def normalize_and_validate_immatriculation(value: str) -> str:
+    raw = (value or "").strip().upper()
+    cleaned = re.sub(r"[^A-Z0-9]", "", raw)   # supprime espaces / tirets / etc.
+    if len(cleaned) != 6:
+        raise ValueError("Immatriculation invalide : 6 caractères requis (ex: AB12CD).")
+    return cleaned
+
+
+
 def get_ba_from_user(user) -> BrandAmbassadors:
     """
     Associe l'utilisateur Django au BA MySQL via email.
@@ -37,6 +82,8 @@ def get_ba_from_user(user) -> BrandAmbassadors:
         created_at=timezone.now(),
         updated_at=timezone.now(),
     )
+
+
 def get_stations():
     qs = Stations.objects.all()
     # On renvoie un format compatible template (id + name)
@@ -47,6 +94,8 @@ def get_stations():
             label = f"{s.nom} - {s.ville}"
         out.append({"id": s.id, "name": label})
     return out
+
+
 def get_recent_recruits(user):
     ba = get_ba_from_user(user)
     drivers = Chauffeurs.objects.filter(ba_id=ba.id).order_by("-created_at")[:6]
@@ -74,6 +123,8 @@ def get_recent_recruits(user):
         })
     # Tri par date (si vide, reste en bas)
     return out[:10]
+
+
 def get_dashboard_payload(user):
     ba = get_ba_from_user(user)
     now = timezone.now()
@@ -109,6 +160,8 @@ def get_dashboard_payload(user):
         "streak": ba.serie_jours or 0,
         "targetProgress": target_progress,
     }
+
+
 def get_challenges(user):
     # Tu as aussi participations_challenges : on pourra calculer le vrai progress ensuite
     today = timezone.now()
@@ -123,31 +176,48 @@ def get_challenges(user):
             "endsIn": ch.date_fin.strftime("%d/%m/%Y") if ch.date_fin else "",
         })
     return out
+
+
 def get_leaderboard():
     # Option simple : basé sur rang/commission_totale si tu veux
     # Ici on laisse vide ; on peut le brancher ensuite.
     return []
+
+
 def create_driver_enrollment(user, post):
     ba = get_ba_from_user(user)
     full = (post.get("name") or "").strip()
     parts = full.split()
     nom = parts[-1] if parts else ""
     prenom = " ".join(parts[:-1]) if len(parts) > 1 else full
-    station_id = int(post.get("station_id") or 1)
-    vehicle_number = (post.get("vehicleNumber") or "").strip().upper()
+    phone = (post.get("phone") or "").strip()
+    if not phone:
+        raise ValueError("Téléphone obligatoire.")
+    # ✅ Zone -> station_id (on garde ton schéma existant: Chauffeurs.station_id FK Stations)
+    zone = (post.get("zone") or "").strip()
+    if not zone:
+        raise ValueError("Zone obligatoire.")
+    station = get_or_create_station_for_zone(zone)
+    # ✅ Adresse
+    adresse = (post.get("address") or "").strip() or None
+    # ✅ Immatriculation normalisée + 6 caractères
+    vehicle_number = normalize_and_validate_immatriculation(post.get("vehicleNumber"))
     vehicle_model = (post.get("vehicleModel") or "N/A").strip()
+    marque = (vehicle_model.split(" ")[0] if vehicle_model and vehicle_model != "N/A" else "N/A")
     try:
         d = Chauffeurs.objects.create(
             ba_id=ba.id,
-            station_id=station_id,
+            station_id=station.id,
             nom=nom,
             prenom=prenom,
-            telephone=(post.get("phone") or "").strip(),
+            telephone=phone,
             email=(post.get("email") or "").strip() or None,
             vehicule_immatriculation=vehicle_number,
-            vehicule_marque=vehicle_model.split(" ")[0],
+            vehicule_marque=marque,
             vehicule_modele=vehicle_model,
             vehicule_couleur="N/A",
+            # ⚠️ ce champ n’existe pas encore dans ta table chauffeurs -> voir étape “DB” plus bas
+            adresse=adresse,
             photo_profil_url="temp.jpg",
             photo_id_url="temp_id.jpg",
             statut="INSCRIT",
@@ -155,17 +225,18 @@ def create_driver_enrollment(user, post):
             updated_at=timezone.now(),
         )
     except IntegrityError as e:
-        # collisions uniques: telephone / immatriculation
         raise Exception("Téléphone ou immatriculation déjà utilisés.") from e
     Commissions.objects.create(
         ba_id=ba.id,
         type="ENROLL_DRIVER",
         montant=5000,
-        recrue_type="ChauffEUR",
+        recrue_type="CHAUFFEUR",  # ✅ corrigé (ton 'ChauffEUR' est bizarre)
         recrue_id=d.id,
         statut="PENDING",
         created_at=timezone.now(),
     )
+
+
 def create_passenger_enrollment(user, post):
     ba = get_ba_from_user(user)
     full = (post.get("name") or "").strip()

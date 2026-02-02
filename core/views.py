@@ -8,8 +8,11 @@ from .models import BAProfile
 from .models_legacy import BrandAmbassadors
 from .services import (
     get_dashboard_payload, get_challenges, get_leaderboard, get_recent_recruits, get_stations,
-    create_driver_enrollment, create_passenger_enrollment
+    create_driver_enrollment, create_passenger_enrollment, get_zones
 )
+
+
+
 def login_page(request):
     if request.user.is_authenticated:
         return redirect("ba_app")
@@ -68,9 +71,13 @@ def login_page(request):
                 login(request, u)
                 return redirect("ba_app")
     return render(request, "core/login.html", {"mode": mode})
+
+
 def logout_view(request):
     logout(request)
     return redirect("login")
+
+
 @login_required
 def ba_app(request):
     tab = request.GET.get("tab", "dashboard")
@@ -80,9 +87,11 @@ def ba_app(request):
         "challenges": get_challenges(request.user),
         "leaderboard": get_leaderboard(),
         "recruits": get_recent_recruits(request.user),
-        "stations": get_stations(),
+        "zones": get_zones(),
     }
     return render(request, "core/app.html", ctx)
+
+
 @login_required
 @transaction.atomic
 def enroll_driver(request):
@@ -94,6 +103,8 @@ def enroll_driver(request):
     except Exception as e:
         messages.error(request, f"❌ Échec enrôlement chauffeur: {str(e)}")
     return redirect("/app/?tab=dashboard")
+
+
 @login_required
 @transaction.atomic
 def enroll_passenger(request):
