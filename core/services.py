@@ -102,7 +102,7 @@ def get_recent_recruits(user):
             "type": "Chauffeur",
             "date": d.created_at.strftime("%d/%m/%Y") if d.created_at else "",
             "status": "Activé" if is_active else "Inscrit",
-            "commission": 5000,
+            "commission": 1000,
         })
     for p in passengers:
         is_active = getattr(p, "statut", "") in ["ACTIF", "ACTIVE"]
@@ -271,7 +271,7 @@ def create_driver_enrollment(user, post):
     Commissions.objects.create(
         ba_id=ba.id,
         type="ENROLL_DRIVER",
-        montant=5000,
+        montant=1000,
         recrue_type="CHAUFFEUR",
         recrue_id=d.id,
         statut="PENDING",
