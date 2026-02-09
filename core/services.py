@@ -223,7 +223,7 @@ def get_leaderboard():
     data.sort(key=lambda x: x["total_enrollments"], reverse=True)
     for i, item in enumerate(data):
         item["rank"] = i + 1
-    return data[:20]
+    return data[:3]
 
 
 def create_driver_enrollment(user, post):
