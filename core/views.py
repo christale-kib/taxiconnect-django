@@ -8,7 +8,7 @@ from .models import BAProfile
 from .models_legacy import BrandAmbassadors
 from .services import (
     get_dashboard_payload, get_challenges, get_leaderboard, get_recent_recruits,
-    get_stations, create_driver_enrollment, create_passenger_enrollment,
+    get_stations, create_driver_enrollment,
     get_zones, get_withdrawals, create_withdrawal,
 )
 
@@ -90,19 +90,6 @@ def enroll_driver(request):
         messages.success(request, "✅ Enrôlement chauffeur réussi !")
     except Exception as e:
         messages.error(request, f"❌ Échec enrôlement chauffeur: {str(e)}")
-    return redirect("/app/?tab=dashboard")
-
-
-@login_required
-@transaction.atomic
-def enroll_passenger(request):
-    if request.method != "POST":
-        return redirect("ba_app")
-    try:
-        create_passenger_enrollment(request.user, request.POST)
-        messages.success(request, "✅ Enrôlement passager réussi !")
-    except Exception as e:
-        messages.error(request, f"❌ Échec enrôlement passager: {str(e)}")
     return redirect("/app/?tab=dashboard")
 
 
