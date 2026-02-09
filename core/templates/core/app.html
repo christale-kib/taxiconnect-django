@@ -9,193 +9,108 @@
   </head>
   <body class="bg-gray-50">
     <div class="max-w-md mx-auto bg-gray-50 min-h-screen pb-20">
-      <!-- Header -->
-      <div
-        class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-4 pb-6 rounded-b-3xl shadow-lg"
-      >
+      <!-- Header — ROUGE -->
+      <div class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 pb-6 rounded-b-3xl shadow-lg">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center space-x-3">
-            <div
-              class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center"
-            >
+            <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
               <i data-lucide="award"></i>
             </div>
             <div>
               <div class="font-bold text-lg">{{ ba.name }}</div>
               <div class="text-xs opacity-90 flex items-center">
-                <span class="bg-white/20 px-2 py-0.5 rounded-full mr-2"
-                  >{{ ba.level }}</span
-                >
+                <span class="bg-white/20 px-2 py-0.5 rounded-full mr-2">{{ ba.level }}</span>
                 Rang #{{ ba.rank }}
               </div>
             </div>
           </div>
-          <a
-            href="/logout/"
-            class="bg-white/20 px-3 py-2 rounded-full text-xs font-semibold"
-            >Logout</a
-          >
+          <a href="/logout/" class="bg-white/20 px-3 py-2 rounded-full text-xs font-semibold">Logout</a>
         </div>
       </div>
+
       <div class="p-4">
-        {% if messages %} {% for m in messages %}
-        <div
-          class="mb-3 p-3 rounded-lg text-sm {% if m.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}"
-        >
+        {% if messages %}{% for m in messages %}
+        <div class="mb-3 p-3 rounded-lg text-sm {% if m.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}">
           {{ m }}
         </div>
-        {% endfor %} {% endif %} {% if tab == "dashboard" %}
+        {% endfor %}{% endif %}
+
+        {% if tab == "dashboard" %}
         <!-- Dashboard cards -->
         <div class="grid grid-cols-2 gap-3">
-          <div
-            class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl p-4 text-white"
-          >
+          <div class="bg-gradient-to-br from-red-500 to-red-700 rounded-xl p-4 text-white">
             <div class="text-sm opacity-90">Chauffeurs Actifs</div>
             <div class="text-3xl font-bold mt-1">{{ ba.activeDrivers }}</div>
-            <div class="text-xs mt-1 opacity-80">
-              sur {{ ba.totalDrivers }} recrutés
-            </div>
+            <div class="text-xs mt-1 opacity-80">sur {{ ba.totalDrivers }} recrutés</div>
           </div>
-          <div
-            class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl p-4 text-white"
-          >
+          <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl p-4 text-white">
             <div class="text-sm opacity-90">Commissions Mois</div>
-            <div class="text-2xl font-bold mt-1">
-              {{ ba.monthlyCommission }}
-            </div>
+            <div class="text-2xl font-bold mt-1">{{ ba.monthlyCommission }}</div>
             <div class="text-xs mt-1 opacity-80">XAF</div>
           </div>
-          <div
-            class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-4 text-white"
-          >
+          <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-4 text-white">
             <div class="text-sm opacity-90">Passagers</div>
             <div class="text-3xl font-bold mt-1">{{ ba.totalPassengers }}</div>
             <div class="text-xs mt-1 opacity-80">total recrutés</div>
           </div>
-          <div
-            class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-4 text-white"
-          >
+          <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-4 text-white">
             <div class="text-sm opacity-90">Série en cours</div>
             <div class="text-3xl font-bold mt-1">{{ ba.streak }} 🔥</div>
             <div class="text-xs mt-1 opacity-80">jours consécutifs</div>
           </div>
         </div>
         <!-- Objectif -->
-        <div
-          class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-4"
-        >
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-4">
           <div class="flex items-center justify-between mb-2">
             <div class="font-semibold text-gray-800">Objectif Mensuel</div>
             <div class="text-sm text-gray-500">{{ ba.targetProgress }}%</div>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-            <div
-              class="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full"
-              style="width: {{ ba.targetProgress }}%"
-            ></div>
+            <div class="bg-gradient-to-r from-red-500 to-red-700 h-3 rounded-full" style="width: {{ ba.targetProgress }}%"></div>
           </div>
           <div class="text-xs text-gray-600">Progression en temps réel</div>
         </div>
+
         {% elif tab == "enroll" %}
-        <!-- Enrôlement (version simple server-side) -->
         <div class="space-y-3">
           <div class="bg-white rounded-xl p-6">
-            <div class="font-bold text-gray-800 text-lg mb-2">
-              Enrôlement Manuel
-            </div>
+            <div class="font-bold text-gray-800 text-lg mb-2">Enrôlement Manuel</div>
             <!-- Chauffeur -->
             <form method="post" action="/app/enroll/driver/" class="space-y-3">
               {% csrf_token %}
-              <div class="font-semibold text-sm text-gray-700">
-                🚕 Chauffeur
-              </div>
-              <input
-                name="name"
-                placeholder="Nom complet"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <input
-                name="phone"
-                placeholder="+242..."
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <!-- ✅ Zone (remplace Station) -->
+              <div class="font-semibold text-sm text-gray-700">🚕 Chauffeur</div>
+              <input name="name" placeholder="Nom complet" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <input name="phone" placeholder="+242..." class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
               <div class="space-y-1">
-                <select
-                  name="zone"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                  required
-                >
+                <select name="zone" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required>
                   <option value="">Sélectionner une zone</option>
-                  {% for z in zones %}
-                  <option value="{{ z }}">{{ z }}</option>
-                  {% endfor %}
+                  {% for z in zones %}<option value="{{ z }}">{{ z }}</option>{% endfor %}
                 </select>
-                <div class="text-[11px] text-gray-500">La zone crée</div>
               </div>
-              <!-- ✅ Adresse chauffeur -->
-              <input
-                name="address"
-                placeholder="Adresse (quartier, rue, repère...)"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-              />
-              <!-- ✅ Immatriculation + aide -->
+              <input name="address" placeholder="Adresse (quartier, rue, repère...)" class="w-full px-4 py-3 border border-gray-300 rounded-xl" />
               <div class="space-y-1">
-                <input
-                  name="vehicleNumber"
-                  placeholder="Immatriculation (6 caractères ex: AB12CD)"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl uppercase"
-                  minlength="6"
-                  maxlength="12"
-                  required
-                />
-                <div class="text-[11px] text-gray-500">
-                  6 caractères requis. Les espaces/tirets seront ignorés.
-                </div>
+                <input name="vehicleNumber" placeholder="Immatriculation (6 car. ex: AB12CD)" class="w-full px-4 py-3 border border-gray-300 rounded-xl uppercase" minlength="6" maxlength="12" required />
+                <div class="text-[11px] text-gray-500">6 caractères requis.</div>
               </div>
-              <input
-                name="vehicleModel"
-                placeholder="Marque & modèle"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <button
-                class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold py-4 rounded-xl shadow-lg"
-              >
+              <input name="vehicleModel" placeholder="Marque & modèle" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <button class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold py-4 rounded-xl shadow-lg">
                 Confirmer l'Enrôlement (+1 000 XAF)
               </button>
             </form>
             <div class="h-px bg-gray-200 my-5"></div>
             <!-- Passager -->
-            <form
-              method="post"
-              action="/app/enroll/passenger/"
-              class="space-y-3"
-            >
+            <form method="post" action="/app/enroll/passenger/" class="space-y-3">
               {% csrf_token %}
               <div class="font-semibold text-sm text-gray-700">👤 Passager</div>
-              <input
-                name="name"
-                placeholder="Nom complet"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <input
-                name="phone"
-                placeholder="+242..."
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <button
-                class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-4 rounded-xl shadow-lg"
-              >
+              <input name="name" placeholder="Nom complet" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <input name="phone" placeholder="+242..." class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <button class="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold py-4 rounded-xl shadow-lg">
                 Confirmer l'Enrôlement (+500 XAF)
               </button>
             </form>
           </div>
         </div>
+
         {% elif tab == "recruits" %}
         <div class="space-y-2">
           {% for r in recruits %}
@@ -203,101 +118,104 @@
             <div class="flex items-center justify-between">
               <div>
                 <div class="font-semibold text-gray-800">{{ r.name }}</div>
-                <div class="text-xs text-gray-500">
-                  {{ r.type }} • {{ r.date }} • {{ r.status }}
-                </div>
+                <div class="text-xs text-gray-500">{{ r.type }} • {{ r.date }} • {{ r.status }}</div>
               </div>
-              <div class="text-xs font-semibold text-green-600">
-                +{{ r.commission }} XAF
-              </div>
+              <div class="text-xs font-semibold text-green-600">+{{ r.commission }} XAF</div>
             </div>
           </div>
           {% empty %}
           <div class="text-xs text-gray-500">Aucune recrue.</div>
           {% endfor %}
         </div>
+
         {% elif tab == "leaderboard" %}
-        <div
-          class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y"
-        >
-          {% for ba in leaderboard %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y">
+          {% for item in leaderboard %}
           <div class="p-4 flex items-center justify-between">
-            <div class="font-semibold text-gray-800">{{ ba.name }}</div>
-            <div class="text-xs text-gray-600">{{ ba.drivers }} chauffeurs</div>
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full {% if forloop.counter <= 3 %}bg-red-100 text-red-700{% else %}bg-gray-100 text-gray-600{% endif %} flex items-center justify-center font-bold text-sm">
+                {{ item.rank }}
+              </div>
+              <div class="font-semibold text-gray-800">{{ item.name }}</div>
+            </div>
+            <div class="text-xs text-gray-600">{{ item.total_enrollments }} enrôlements</div>
           </div>
           {% empty %}
-          <div class="p-4 text-xs text-gray-500">
-            Classement non disponible.
-          </div>
+          <div class="p-4 text-xs text-gray-500">Classement non disponible.</div>
           {% endfor %}
         </div>
+
         {% elif tab == "commissions" %}
-        <div
-          class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 text-white"
-        >
+        <div class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 text-white">
           <div class="text-sm opacity-90 mb-1">Total ce Mois</div>
-          <div class="text-4xl font-bold mb-3">
-            {{ ba.monthlyCommission }} XAF
-          </div>
+          <div class="text-4xl font-bold mb-3">{{ ba.monthlyCommission }} XAF</div>
           <div class="flex items-center justify-between text-sm">
-            <div class="opacity-90">
-              En attente: {{ ba.pendingCommission }} XAF
-            </div>
+            <div class="opacity-90">En attente: {{ ba.pendingCommission }} XAF</div>
             <div class="bg-white/20 px-3 py-1 rounded-full">Live</div>
           </div>
         </div>
+        <!-- ✅ NOUVEAU : Bouton Retrait Commission -->
+        <div class="mt-4">
+          <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div class="font-semibold text-gray-800 mb-3">💰 Retrait Commission</div>
+            <form method="post" action="/app/withdraw/" class="space-y-3">
+              {% csrf_token %}
+              <input name="montant" type="number" min="500" step="100" placeholder="Montant à retirer (XAF)" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <input name="telephone_retrait" placeholder="N° Airtel Money (+242...)" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <button class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold py-4 rounded-xl shadow-lg">
+                Demander le Retrait
+              </button>
+            </form>
+          </div>
+        </div>
+        <!-- Historique retraits -->
+        {% if withdrawals %}
+        <div class="mt-4">
+          <div class="font-semibold text-gray-800 mb-2">Historique Retraits</div>
+          <div class="space-y-2">
+            {% for w in withdrawals %}
+            <div class="bg-white border border-gray-200 rounded-xl p-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <div class="font-semibold text-gray-800">{{ w.montant }} XAF</div>
+                  <div class="text-xs text-gray-500">{{ w.date }} • {{ w.telephone }}</div>
+                </div>
+                <div class="text-xs font-semibold px-2 py-1 rounded-full {% if w.statut == 'PAYÉ' %}bg-green-100 text-green-700{% elif w.statut == 'EN_COURS' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                  {{ w.statut }}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
         {% endif %}
       </div>
-      <!-- Bottom Nav -->
-      <div
-        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg"
-      >
+
+      <!-- Bottom Nav — ROUGE -->
+      <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
         <div class="max-w-md mx-auto grid grid-cols-5">
-          <a
-            href="/app/?tab=dashboard"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'dashboard' %}text-orange-500{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="home"></i
-            ><span class="text-xs font-medium">Accueil</span>
+          <a href="/app/?tab=dashboard" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'dashboard' %}text-red-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="home"></i><span class="text-xs font-medium">Accueil</span>
           </a>
-          <a
-            href="/app/?tab=recruits"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'recruits' %}text-orange-500{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="users"></i
-            ><span class="text-xs font-medium">Recrues</span>
+          <a href="/app/?tab=recruits" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'recruits' %}text-red-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="users"></i><span class="text-xs font-medium">Recrues</span>
           </a>
           <a href="/app/?tab=enroll" class="relative -mt-4 text-center">
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-yellow-500 to-orange-500 mx-auto"
-            >
+            <div class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-red-600 to-red-700 mx-auto">
               <i data-lucide="user-plus" class="text-white"></i>
             </div>
-            <div
-              class="text-xs font-medium mt-1 {% if tab == 'enroll' %}text-orange-500{% else %}text-gray-700{% endif %}"
-            >
-              Enrôler
-            </div>
+            <div class="text-xs font-medium mt-1 {% if tab == 'enroll' %}text-red-600{% else %}text-gray-700{% endif %}">Enrôler</div>
           </a>
-          <a
-            href="/app/?tab=leaderboard"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'leaderboard' %}text-orange-500{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="trending-up"></i
-            ><span class="text-xs font-medium">Ranking</span>
+          <a href="/app/?tab=leaderboard" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'leaderboard' %}text-red-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="trending-up"></i><span class="text-xs font-medium">Ranking</span>
           </a>
-          <a
-            href="/app/?tab=commissions"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'commissions' %}text-orange-500{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="target"></i
-            ><span class="text-xs font-medium">Gains</span>
+          <a href="/app/?tab=commissions" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'commissions' %}text-red-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="target"></i><span class="text-xs font-medium">Gains</span>
           </a>
         </div>
       </div>
     </div>
-    <script>
-      lucide.createIcons();
-    </script>
+    <script>lucide.createIcons();</script>
   </body>
 </html>

@@ -7,16 +7,16 @@ from django.utils import timezone
 from .models import BAProfile
 from .models_legacy import BrandAmbassadors
 from .services import (
-    get_dashboard_payload, get_challenges, get_leaderboard, get_recent_recruits, get_stations,
-    create_driver_enrollment, create_passenger_enrollment, get_zones
+    get_dashboard_payload, get_challenges, get_leaderboard, get_recent_recruits,
+    get_stations, create_driver_enrollment, create_passenger_enrollment,
+    get_zones, get_withdrawals, create_withdrawal,
 )
-
 
 
 def login_page(request):
     if request.user.is_authenticated:
         return redirect("ba_app")
-    mode = request.GET.get("mode", "login")  # login | register
+    mode = request.GET.get("mode", "login")
     if request.method == "POST":
         action = request.POST.get("action")
         if action == "login":
@@ -37,37 +37,24 @@ def login_page(request):
             if User.objects.filter(username=email).exists():
                 messages.error(request, "Cet email existe déjà.")
             else:
-                # 1) Créer user Django
                 u = User.objects.create_user(
-                    username=email,
-                    email=email,
-                    password=password,
-                    first_name=prenom,
-                    last_name=nom,
+                    username=email, email=email, password=password,
+                    first_name=prenom, last_name=nom,
                 )
-                # 2) Créer profile BA Django (UI / objectifs)
                 BAProfile.objects.create(
-                    user=u,
-                    telephone=telephone,
-                    monthly_target=100,
-                    level="Brand Ambassador"
+                    user=u, telephone=telephone,
+                    monthly_target=100, level="Brand Ambassador",
                 )
-                # 3) Créer (ou récupérer) le BA MySQL
-                # ⚠️ email + telephone sont uniques côté MySQL
                 BrandAmbassadors.objects.get_or_create(
                     email=email,
                     defaults={
-                        "nom": nom,
-                        "prenom": prenom,
+                        "nom": nom, "prenom": prenom,
                         "telephone": telephone or f"TEMP-{u.id}",
-                        "password_hash": "",  # tu peux mettre un vrai hash plus tard
-                        "niveau": "Brand Ambassador",
+                        "password_hash": "", "niveau": "Brand Ambassador",
                         "statut": "ACTIF",
-                        "created_at": timezone.now(),
-                        "updated_at": timezone.now(),
-                    }
+                        "created_at": timezone.now(), "updated_at": timezone.now(),
+                    },
                 )
-                # 4) Login
                 login(request, u)
                 return redirect("ba_app")
     return render(request, "core/login.html", {"mode": mode})
@@ -88,6 +75,7 @@ def ba_app(request):
         "leaderboard": get_leaderboard(),
         "recruits": get_recent_recruits(request.user),
         "zones": get_zones(),
+        "withdrawals": get_withdrawals(request.user),
     }
     return render(request, "core/app.html", ctx)
 
@@ -116,3 +104,17 @@ def enroll_passenger(request):
     except Exception as e:
         messages.error(request, f"❌ Échec enrôlement passager: {str(e)}")
     return redirect("/app/?tab=dashboard")
+
+
+@login_required
+@transaction.atomic
+def withdraw_commission(request):
+    """✅ NOUVEAU : Retrait de commission BA."""
+    if request.method != "POST":
+        return redirect("/app/?tab=commissions")
+    try:
+        ref = create_withdrawal(request.user, request.POST)
+        messages.success(request, f"✅ Demande de retrait enregistrée ! Réf: {ref}")
+    except Exception as e:
+        messages.error(request, f"❌ Échec retrait: {str(e)}")
+    return redirect("/app/?tab=commissions")

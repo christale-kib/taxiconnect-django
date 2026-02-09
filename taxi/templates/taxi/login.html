@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>TaxiConnect - Espace Chauffeur</title>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-indigo-50 to-blue-100 flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+      <div class="text-center mb-8">
+        <div class="w-20 h-20 bg-gradient-to-br from-indigo-600 to-blue-700 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <span class="text-4xl">🚖</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">TaxiConnect</h1>
+        <p class="text-gray-600">Espace Chauffeur</p>
+      </div>
+      {% if messages %}{% for m in messages %}
+      <div class="mb-4 p-3 rounded-lg text-sm {% if m.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}">
+        {{ m }}
+      </div>
+      {% endfor %}{% endif %}
+      <!-- Tabs -->
+      <div class="bg-white rounded-xl shadow-lg p-2 mb-6 flex">
+        <a href="?mode=login" class="flex-1 py-3 rounded-lg font-semibold text-center {% if request.GET.mode != 'register' %}bg-gradient-to-r from-indigo-600 to-blue-700 text-white shadow-md{% else %}text-gray-600{% endif %}">
+          Connexion
+        </a>
+        <a href="?mode=register" class="flex-1 py-3 rounded-lg font-semibold text-center {% if request.GET.mode == 'register' %}bg-gradient-to-r from-indigo-600 to-blue-700 text-white shadow-md{% else %}text-gray-600{% endif %}">
+          Inscription
+        </a>
+      </div>
+      <div class="bg-white rounded-xl shadow-lg p-6">
+        {% if request.GET.mode == 'register' %}
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="register" />
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
+              <input name="nom" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
+              <input name="prenom" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Téléphone</label>
+            <input name="telephone" required placeholder="+242 06 XXX XXXX" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+            <input type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Immatriculation</label>
+            <input name="immatriculation" required placeholder="AB12CD" class="w-full px-4 py-3 border border-gray-300 rounded-lg uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Marque & Modèle</label>
+            <input name="vehicleModel" placeholder="Toyota Corolla" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Zone</label>
+            <select name="zone" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="">Sélectionner une zone</option>
+              {% for z in zones %}<option value="{{ z }}">{{ z }}</option>{% endfor %}
+            </select>
+          </div>
+          <button class="w-full bg-gradient-to-r from-indigo-600 to-blue-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all">
+            S'inscrire comme Chauffeur
+          </button>
+        </form>
+        {% else %}
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="login" />
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
+            <input type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          </div>
+          <button class="w-full bg-gradient-to-r from-indigo-600 to-blue-700 text-white font-bold py-4 rounded-lg shadow-lg hover:shadow-xl transition-all">
+            Se connecter
+          </button>
+        </form>
+        {% endif %}
+      </div>
+      <div class="text-center mt-6 text-sm text-gray-600">
+        <p>© 2026 TaxiConnect - Espace Chauffeur</p>
+      </div>
+    </div>
+    <script>lucide.createIcons();</script>
+  </body>
+</html>

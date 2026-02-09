@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>TaxiConnect - Chauffeur</title>
+  </head>
+  <body class="bg-gray-50">
+    <div class="max-w-md mx-auto bg-gray-50 min-h-screen pb-20">
+      <!-- Header — BLEU INDIGO -->
+      <div class="bg-gradient-to-r from-indigo-600 to-blue-700 text-white p-4 pb-6 rounded-b-3xl shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center">
+              <i data-lucide="car"></i>
+            </div>
+            <div>
+              <div class="font-bold text-lg">{{ driver.name }}</div>
+              <div class="text-xs opacity-90 flex items-center">
+                <span class="bg-white/20 px-2 py-0.5 rounded-full mr-2">{{ driver.immatriculation }}</span>
+                Rang #{{ driver.rank }}
+              </div>
+            </div>
+          </div>
+          <a href="/taxi/logout/" class="bg-white/20 px-3 py-2 rounded-full text-xs font-semibold">Logout</a>
+        </div>
+      </div>
+
+      <div class="p-4">
+        {% if messages %}{% for m in messages %}
+        <div class="mb-3 p-3 rounded-lg text-sm {% if m.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}">
+          {{ m }}
+        </div>
+        {% endfor %}{% endif %}
+
+        {% if tab == "dashboard" %}
+        <!-- Dashboard cards -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gradient-to-br from-indigo-500 to-blue-700 rounded-xl p-4 text-white">
+            <div class="text-sm opacity-90">Courses Total</div>
+            <div class="text-3xl font-bold mt-1">{{ driver.totalTransactions }}</div>
+            <div class="text-xs mt-1 opacity-80">ce mois: {{ driver.monthlyTransactions }}</div>
+          </div>
+          <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl p-4 text-white">
+            <div class="text-sm opacity-90">Revenus Mois</div>
+            <div class="text-2xl font-bold mt-1">{{ driver.monthlyRevenue }}</div>
+            <div class="text-xs mt-1 opacity-80">XAF</div>
+          </div>
+          <div class="bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl p-4 text-white">
+            <div class="text-sm opacity-90">Taxis Recrutés</div>
+            <div class="text-3xl font-bold mt-1">{{ driver.totalRecruits }}</div>
+            <div class="text-xs mt-1 opacity-80">enrôlés par vous</div>
+          </div>
+          <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-4 text-white">
+            <div class="text-sm opacity-90">Note Moyenne</div>
+            <div class="text-3xl font-bold mt-1">{{ driver.note }} ⭐</div>
+            <div class="text-xs mt-1 opacity-80">sur 5</div>
+          </div>
+        </div>
+        <!-- Revenue total -->
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm text-gray-500">Revenus Totaux</div>
+              <div class="text-2xl font-bold text-gray-800">{{ driver.totalRevenue }} XAF</div>
+            </div>
+            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+              <i data-lucide="trending-up" class="text-indigo-600"></i>
+            </div>
+          </div>
+        </div>
+
+        {% elif tab == "enroll" %}
+        <!-- Enrôlement d'un autre TAXI -->
+        <div class="space-y-3">
+          <div class="bg-white rounded-xl p-6">
+            <div class="font-bold text-gray-800 text-lg mb-2">🚖 Enrôler un Taxi</div>
+            <p class="text-sm text-gray-500 mb-4">Recrutez un nouveau chauffeur dans le réseau TaxiConnect.</p>
+            <form method="post" action="/taxi/app/enroll/taxi/" class="space-y-3">
+              {% csrf_token %}
+              <input name="name" placeholder="Nom complet du chauffeur" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <input name="phone" placeholder="+242..." class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <select name="zone" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required>
+                <option value="">Sélectionner une zone</option>
+                {% for z in zones %}<option value="{{ z }}">{{ z }}</option>{% endfor %}
+              </select>
+              <input name="address" placeholder="Adresse (quartier, rue...)" class="w-full px-4 py-3 border border-gray-300 rounded-xl" />
+              <div class="space-y-1">
+                <input name="vehicleNumber" placeholder="Immatriculation (6 car. ex: AB12CD)" class="w-full px-4 py-3 border border-gray-300 rounded-xl uppercase" minlength="6" maxlength="12" required />
+                <div class="text-[11px] text-gray-500">6 caractères requis.</div>
+              </div>
+              <input name="vehicleModel" placeholder="Marque & modèle" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <button class="w-full bg-gradient-to-r from-indigo-600 to-blue-700 text-white font-semibold py-4 rounded-xl shadow-lg">
+                Confirmer l'Enrôlement Taxi
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {% elif tab == "payment" %}
+        <!-- Initier un PAIEMENT pour un passager -->
+        <div class="space-y-3">
+          <div class="bg-white rounded-xl p-6">
+            <div class="font-bold text-gray-800 text-lg mb-2">💳 Initier un Paiement</div>
+            <p class="text-sm text-gray-500 mb-4">Enregistrez le paiement d'une course passager.</p>
+            <form method="post" action="/taxi/app/payment/" class="space-y-3">
+              {% csrf_token %}
+              <input name="phone_passager" placeholder="Téléphone passager (+242...)" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <input name="montant" type="number" min="100" step="50" placeholder="Montant de la course (XAF)" class="w-full px-4 py-3 border border-gray-300 rounded-xl" required />
+              <select name="methode" class="w-full px-4 py-3 border border-gray-300 rounded-xl">
+                <option value="AIRTEL_MONEY">Airtel Money</option>
+                <option value="MTN_MOMO">MTN MoMo</option>
+                <option value="CASH">Espèces</option>
+              </select>
+              <button class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-4 rounded-xl shadow-lg">
+                Confirmer le Paiement
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {% elif tab == "recruits" %}
+        <!-- Liste des taxis enrôlés -->
+        <div class="font-bold text-gray-800 text-lg mb-3">Mes Taxis Recrutés</div>
+        <div class="space-y-2">
+          {% for r in recruits %}
+          <div class="bg-white border border-gray-200 rounded-xl p-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold text-gray-800">{{ r.name }}</div>
+                <div class="text-xs text-gray-500">{{ r.immat }} • {{ r.phone }} • {{ r.date }}</div>
+              </div>
+              <div class="text-xs font-semibold px-2 py-1 rounded-full {% if r.status == 'ACTIF' %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                {{ r.status }}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-xs text-gray-500">Aucun taxi recruté.</div>
+          {% endfor %}
+        </div>
+
+        {% elif tab == "payments" %}
+        <!-- Historique des paiements -->
+        <div class="font-bold text-gray-800 text-lg mb-3">Historique Paiements</div>
+        <div class="space-y-2">
+          {% for p in payments %}
+          <div class="bg-white border border-gray-200 rounded-xl p-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-semibold text-gray-800">{{ p.montant }} XAF</div>
+                <div class="text-xs text-gray-500">{{ p.passager }} • {{ p.methode }} • {{ p.date }}</div>
+              </div>
+              <div class="text-xs font-semibold px-2 py-1 rounded-full {% if p.statut == 'COMPLETED' %}bg-green-100 text-green-700{% elif p.statut == 'PENDING' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                {{ p.statut }}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="text-xs text-gray-500">Aucun paiement.</div>
+          {% endfor %}
+        </div>
+
+        {% elif tab == "leaderboard" %}
+        <div class="font-bold text-gray-800 text-lg mb-3">Classement Chauffeurs</div>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y">
+          {% for item in leaderboard %}
+          <div class="p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-full {% if forloop.counter <= 3 %}bg-indigo-100 text-indigo-700{% else %}bg-gray-100 text-gray-600{% endif %} flex items-center justify-center font-bold text-sm">
+                {{ item.rank }}
+              </div>
+              <div class="font-semibold text-gray-800">{{ item.name }}</div>
+            </div>
+            <div class="text-xs text-gray-600">{{ item.total_payments }} courses</div>
+          </div>
+          {% empty %}
+          <div class="p-4 text-xs text-gray-500">Classement non disponible.</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Bottom Nav — BLEU INDIGO (5 onglets) -->
+      <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+        <div class="max-w-md mx-auto grid grid-cols-5">
+          <a href="/taxi/app/?tab=dashboard" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'dashboard' %}text-indigo-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="home"></i><span class="text-xs font-medium">Accueil</span>
+          </a>
+          <a href="/taxi/app/?tab=enroll" class="relative -mt-4 text-center">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-indigo-600 to-blue-700 mx-auto">
+              <i data-lucide="user-plus" class="text-white w-5 h-5"></i>
+            </div>
+            <div class="text-xs font-medium mt-1 {% if tab == 'enroll' %}text-indigo-600{% else %}text-gray-700{% endif %}">Taxi</div>
+          </a>
+          <a href="/taxi/app/?tab=payment" class="relative -mt-4 text-center">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-emerald-600 mx-auto">
+              <i data-lucide="credit-card" class="text-white w-5 h-5"></i>
+            </div>
+            <div class="text-xs font-medium mt-1 {% if tab == 'payment' %}text-green-600{% else %}text-gray-700{% endif %}">Payer</div>
+          </a>
+          <a href="/taxi/app/?tab=payments" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'payments' %}text-indigo-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="receipt"></i><span class="text-xs font-medium">Courses</span>
+          </a>
+          <a href="/taxi/app/?tab=leaderboard" class="p-3 flex flex-col items-center space-y-1 {% if tab == 'leaderboard' %}text-indigo-600{% else %}text-gray-400{% endif %}">
+            <i data-lucide="trophy"></i><span class="text-xs font-medium">Ranking</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <script>lucide.createIcons();</script>
+  </body>
+</html>
