@@ -1,3 +1,4 @@
+import json
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -8,7 +9,7 @@ from .models import BAProfile
 from .models_legacy import BrandAmbassadors
 from .services import (
     get_dashboard_payload, get_challenges, get_leaderboard, get_recent_recruits,
-    get_stations, create_driver_enrollment,
+    get_stations, create_driver_enrollment, create_passenger_enrollment,
     get_zones, get_withdrawals, create_withdrawal,
 )
 
@@ -68,14 +69,69 @@ def logout_view(request):
 @login_required
 def ba_app(request):
     tab = request.GET.get("tab", "dashboard")
+    ba = get_dashboard_payload(request.user)
+    recruits = get_recent_recruits(request.user)
+    leaderboard = get_leaderboard()
+    withdrawals = get_withdrawals(request.user)
+    zones = get_zones()
+
+    # Build rankings JSON for the new design
+    ba_name = ba["name"]
+    rankings_json = []
+    for item in leaderboard:
+        rankings_json.append({
+            "name": item["name"],
+            "recruits": item["total_enrollments"],
+            "score": item["total_enrollments"] * 5000,
+            "isYou": item["name"].strip().lower() == ba_name.strip().lower(),
+        })
+
+    # Build recruits JSON
+    recruits_json = []
+    for r in recruits:
+        status_map = {"Activé": "actif", "Inscrit": "en_attente"}
+        recruits_json.append({
+            "id": r["id"],
+            "name": r["name"],
+            "type": r["type"],
+            "phone": "",
+            "city": "",
+            "plate": "",
+            "vehicle": r["type"],
+            "airtel": "",
+            "status": status_map.get(r["status"], "en_attente"),
+            "date": r["date"],
+            "passengers": 0,
+            "commission": r["commission"],
+            "notes": "",
+        })
+
+    # Build transactions JSON from withdrawals
+    transactions_json = []
+    for i, w in enumerate(withdrawals):
+        transactions_json.append({
+            "id": i + 1,
+            "type": "debit",
+            "label": f"Retrait - {w['reference']}",
+            "amount": -w["montant"],
+            "date": w["date"],
+            "status": w["statut"],
+        })
+
     ctx = {
         "tab": tab,
-        "ba": get_dashboard_payload(request.user),
+        "ba": ba,
         "challenges": get_challenges(request.user),
-        "leaderboard": get_leaderboard(),
-        "recruits": get_recent_recruits(request.user),
-        "zones": get_zones(),
-        "withdrawals": get_withdrawals(request.user),
+        "leaderboard": leaderboard,
+        "recruits": recruits,
+        "zones": zones,
+        "withdrawals": withdrawals,
+        # JSON data for the new JS-driven design
+        "ba_json": json.dumps(ba),
+        "recruits_json": json.dumps(recruits_json),
+        "rankings_json": json.dumps(rankings_json),
+        "transactions_json": json.dumps(transactions_json),
+        "zones_json": json.dumps(zones),
     }
     return render(request, "core/app.html", ctx)
 
@@ -90,6 +146,19 @@ def enroll_driver(request):
         messages.success(request, "✅ Enrôlement chauffeur réussi !")
     except Exception as e:
         messages.error(request, f"❌ Échec enrôlement chauffeur: {str(e)}")
+    return redirect("/app/?tab=dashboard")
+
+
+@login_required
+@transaction.atomic
+def enroll_passenger(request):
+    if request.method != "POST":
+        return redirect("ba_app")
+    try:
+        create_passenger_enrollment(request.user, request.POST)
+        messages.success(request, "✅ Enrôlement passager réussi !")
+    except Exception as e:
+        messages.error(request, f"❌ Échec enrôlement passager: {str(e)}")
     return redirect("/app/?tab=dashboard")
 
 

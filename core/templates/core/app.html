@@ -1,345 +1,1962 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="fr">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <title>TaxiConnect - BA</title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Brand Ambassador - Airtel Money</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --red-dark: #b71c1c;
+        --red: #c62828;
+        --red-mid: #e53935;
+        --red-light: #ef5350;
+        --red-bg: #ffebee;
+        --green: #2e7d32;
+        --green-light: #43a047;
+        --green-bg: #e8f5e9;
+        --orange: #e65100;
+        --orange-light: #ff6f00;
+        --orange-bg: #fff3e0;
+        --yellow-bg: #fff8e1;
+        --blue: #1565c0;
+        --blue-light: #42a5f5;
+        --bg: #f5f5f7;
+        --card: #fff;
+        --text: #1a1a1a;
+        --text-secondary: #999;
+        --text-tertiary: #bbb;
+        --border: rgba(0, 0, 0, 0.04);
+        --shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+        --radius: 22px;
+        --radius-sm: 14px;
+        --font-display: "Outfit", sans-serif;
+        --font-body: "DM Sans", "Segoe UI", sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        font-family: var(--font-body);
+        background: var(--bg);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+      }
+      .app {
+        max-width: 430px;
+        width: 100%;
+        min-height: 100vh;
+        background: #fafafa;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(28px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.85);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          box-shadow:
+            0 4px 16px rgba(229, 57, 53, 0.4),
+            0 0 0 0 rgba(229, 57, 53, 0.3);
+        }
+        50% {
+          box-shadow:
+            0 4px 16px rgba(229, 57, 53, 0.4),
+            0 0 0 14px rgba(229, 57, 53, 0);
+        }
+      }
+      @keyframes circleProgress {
+        from {
+          stroke-dashoffset: var(--circumference);
+        }
+        to {
+          stroke-dashoffset: var(--target-offset);
+        }
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-4px);
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes confetti {
+        0% {
+          opacity: 1;
+          transform: translateY(0) rotate(0deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(100px) rotate(720deg);
+        }
+      }
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(60px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .page {
+        display: none;
+        animation: fadeIn 0.3s ease;
+      }
+      .page.active {
+        display: block;
+      }
+      .header {
+        background: linear-gradient(
+          135deg,
+          var(--red-dark) 0%,
+          var(--red) 25%,
+          var(--red-mid) 60%,
+          var(--red-light) 100%
+        );
+        padding: 16px 16px 22px;
+        border-radius: 0 0 28px 28px;
+        position: relative;
+        overflow: hidden;
+      }
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -60px;
+        right: -50px;
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+      }
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(12px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 16px;
+        color: #fff;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+      }
+      .user-name {
+        color: #fff;
+        font-weight: 700;
+        font-size: 15px;
+        letter-spacing: -0.02em;
+      }
+      .badges {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 3px;
+        flex-wrap: wrap;
+      }
+      .badge-role {
+        background: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(8px);
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        color: #fff;
+        font-weight: 600;
+      }
+      .badge-rank {
+        background: linear-gradient(135deg, #ffd54f, #ffb300);
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        color: #5d4037;
+        font-weight: 700;
+      }
+      .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .icon-btn {
+        position: relative;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.9);
+        padding: 6px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        transition: background 0.2s;
+      }
+      .icon-btn:active {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .commission-banner {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(16px);
+        border-radius: 14px;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        z-index: 1;
+      }
+      .commission-label {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 10px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .commission-amount {
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        letter-spacing: -0.03em;
+        margin-top: 2px;
+      }
+      .commission-currency {
+        font-size: 12px;
+        font-weight: 500;
+        margin-left: 4px;
+        opacity: 0.65;
+      }
+      .trend-up {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        justify-content: flex-end;
+        color: #a5d6a7;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .trend-label {
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 9px;
+        margin-top: 2px;
+        text-align: right;
+      }
+      .content {
+        padding: 16px 14px 110px;
+      }
+      .card {
+        background: var(--card);
+        border-radius: 18px;
+        padding: 14px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .card:active {
+        transform: scale(0.97);
+      }
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .kpi-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+      }
+      .kpi-icon.red {
+        background: linear-gradient(135deg, #ffebee, #ffcdd2);
+      }
+      .kpi-icon.green {
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+      }
+      .kpi-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .kpi-value {
+        font-size: 26px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        color: var(--text);
+        letter-spacing: -0.03em;
+        margin-top: 6px;
+        line-height: 1;
+      }
+      .kpi-label {
+        color: var(--text-secondary);
+        font-size: 11px;
+        font-weight: 500;
+        margin-top: 3px;
+      }
+      .kpi-badge {
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 6px;
+      }
+      .kpi-badge.warning {
+        background: var(--orange-bg);
+        color: var(--orange);
+      }
+      .kpi-badge.success {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+      .progress-track {
+        margin-top: 8px;
+        height: 4px;
+        background: #f0f0f0;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--red-mid), var(--red-light));
+        border-radius: 10px;
+        transition: width 0.8s ease;
+      }
+      .trend-indicator {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        margin-top: 5px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+      .trend-indicator.up {
+        color: var(--green-light);
+      }
+      .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.01em;
+        margin-bottom: 10px;
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .see-all {
+        font-size: 11px;
+        color: var(--red-mid);
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        border: none;
+        background: none;
+      }
+      .quick-actions {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .action-btn {
+        flex: 1;
+        border-radius: 14px;
+        padding: 12px 8px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+        border: none;
+      }
+      .action-btn:active {
+        transform: scale(0.94);
+      }
+      .action-btn.red {
+        background: linear-gradient(135deg, var(--red), var(--red-mid));
+      }
+      .action-btn.blue {
+        background: linear-gradient(135deg, var(--blue), var(--blue-light));
+      }
+      .action-btn.green {
+        background: linear-gradient(135deg, var(--green), var(--green-light));
+      }
+      .action-emoji {
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
+      .action-label {
+        color: #fff;
+        font-size: 10px;
+        font-weight: 600;
+      }
+      .activity-list {
+        background: var(--card);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        margin-bottom: 18px;
+      }
+      .activity-item {
+        padding: 11px 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.15s;
+        cursor: pointer;
+      }
+      .activity-item:active {
+        background: #fafafa;
+      }
+      .activity-item + .activity-item {
+        border-top: 1px solid #f5f5f5;
+      }
+      .activity-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+      }
+      .activity-icon.recruit {
+        background: var(--green-bg);
+      }
+      .activity-icon.commission {
+        background: var(--orange-bg);
+      }
+      .activity-text {
+        flex: 1;
+        min-width: 0;
+      }
+      .activity-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .activity-meta {
+        font-size: 10px;
+        color: var(--text-secondary);
+        margin-top: 1px;
+      }
+      .status-badge {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 3px 8px;
+        border-radius: 7px;
+        font-size: 10px;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+      .status-badge.active {
+        background: var(--green-bg);
+        color: var(--green);
+      }
+      .status-badge.pending {
+        background: var(--yellow-bg);
+        color: #f57f17;
+      }
+      .status-badge.inactive {
+        background: #f5f5f5;
+        color: #999;
+      }
+      .tip-card {
+        background: linear-gradient(135deg, var(--yellow-bg), var(--orange-bg));
+        border-radius: 16px;
+        padding: 14px 16px;
+        border: 1px solid #ffe0b2;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+      .tip-emoji {
+        font-size: 20px;
+        flex-shrink: 0;
+        animation: float 3s ease-in-out infinite;
+      }
+      .tip-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--orange);
+        margin-bottom: 3px;
+      }
+      .tip-text {
+        font-size: 11px;
+        color: #bf360c;
+        line-height: 1.5;
+      }
+
+      /* Bottom Nav */
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 430px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 6px 8px 14px;
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        z-index: 100;
+        box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
+      }
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 6px 14px;
+        border-radius: 12px;
+        border: none;
+        background: none;
+        position: relative;
+        text-decoration: none;
+      }
+      .nav-item:active {
+        background: rgba(0, 0, 0, 0.04);
+      }
+      .nav-item svg {
+        color: #c0c0c0;
+        transition: color 0.2s;
+      }
+      .nav-item.active svg {
+        color: var(--red-mid);
+      }
+      .nav-label {
+        font-size: 10px;
+        font-weight: 500;
+        color: #c0c0c0;
+        margin-top: 4px;
+        transition: all 0.2s;
+      }
+      .nav-item.active .nav-label {
+        color: var(--red-mid);
+        font-weight: 700;
+      }
+      .nav-dot {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--red-mid);
+        margin-top: 4px;
+      }
+      .nav-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: -26px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        text-decoration: none;
+      }
+      .nav-center-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--red-dark), var(--red-mid));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        animation: pulseGlow 2.5s ease-in-out infinite;
+        transition: transform 0.2s;
+      }
+      .nav-center-btn:active {
+        transform: scale(0.92);
+      }
+      .nav-center .nav-label {
+        color: var(--red-mid);
+        font-weight: 600;
+        margin-top: 5px;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        animation: fadeIn 0.2s ease;
+      }
+      .modal-overlay.show {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 28px 28px 0 0;
+        width: 100%;
+        max-width: 430px;
+        max-height: 92vh;
+        overflow-y: auto;
+        animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .modal-handle {
+        width: 40px;
+        height: 4px;
+        background: #ddd;
+        border-radius: 4px;
+        margin: 12px auto 0;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px 12px;
+      }
+      .modal-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .modal-close {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #f5f5f5;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: #999;
+      }
+      .modal-body {
+        padding: 0 20px 32px;
+      }
+      .form-group {
+        margin-bottom: 18px;
+      }
+      .form-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #eee;
+        border-radius: 14px;
+        font-size: 15px;
+        font-family: var(--font-body);
+        color: var(--text);
+        outline: none;
+        transition: border-color 0.2s;
+        background: #fafafa;
+      }
+      .form-input:focus {
+        border-color: var(--red-mid);
+        background: #fff;
+      }
+      .form-input::placeholder {
+        color: #ccc;
+      }
+      .form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .btn {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 16px;
+        font-size: 15px;
+        font-weight: 700;
+        font-family: var(--font-body);
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          opacity 0.2s;
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--red), var(--red-mid));
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(229, 57, 53, 0.3);
+      }
+      .btn-success {
+        background: linear-gradient(135deg, var(--green), var(--green-light));
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
+      }
+      .btn-secondary {
+        background: #f5f5f5;
+        color: var(--text);
+      }
+
+      /* Toast */
+      .toast-container {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 300;
+        width: 100%;
+        max-width: 400px;
+        padding: 0 16px;
+      }
+      .toast {
+        padding: 14px 18px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-bottom: 8px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      }
+      .toast.success {
+        background: #1b5e20;
+        color: #fff;
+      }
+      .toast.error {
+        background: #b71c1c;
+        color: #fff;
+      }
+      .toast.info {
+        background: #0d47a1;
+        color: #fff;
+      }
+
+      /* Filter pills */
+      .filter-pills {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .filter-pills::-webkit-scrollbar {
+        display: none;
+      }
+      .pill {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+        background: #f0f0f0;
+        color: #666;
+      }
+      .pill.active {
+        background: var(--red-mid);
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3);
+      }
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--card);
+        border-radius: 16px;
+        padding: 4px 4px 4px 16px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        margin-bottom: 16px;
+      }
+      .search-bar input {
+        flex: 1;
+        border: none;
+        background: none;
+        font-size: 14px;
+        font-family: var(--font-body);
+        color: var(--text);
+        outline: none;
+        padding: 10px 0;
+      }
+      .search-bar input::placeholder {
+        color: #ccc;
+      }
+
+      /* Recruit cards */
+      .recruit-card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .recruit-card:active {
+        transform: scale(0.98);
+      }
+      .recruit-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .recruit-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .recruit-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .recruit-detail {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+      .recruit-stats {
+        display: flex;
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .recruit-stat {
+        font-size: 11px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .recruit-stat strong {
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      /* Podium */
+      .podium {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+        padding: 20px 10px 0;
+      }
+      .podium-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .podium-bar {
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 16px 12px 12px;
+        width: 100%;
+        min-width: 90px;
+      }
+      .podium-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 15px;
+        color: #fff;
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        margin-bottom: 8px;
+      }
+      .podium-name {
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+        text-align: center;
+        margin-bottom: 4px;
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .podium-score {
+        font-size: 18px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        color: #fff;
+      }
+      .podium-medal {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      .rank-list-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 16px;
+        background: var(--card);
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+      .rank-number {
+        font-size: 16px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        color: var(--text-secondary);
+        width: 28px;
+        text-align: center;
+      }
+      .rank-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        color: #fff;
+        flex-shrink: 0;
+      }
+      .rank-info {
+        flex: 1;
+      }
+      .rank-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+      }
+      .rank-recruits {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+      .rank-score {
+        font-size: 18px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        color: var(--text);
+      }
+      .rank-you {
+        background: var(--red-bg);
+        border-color: rgba(229, 57, 53, 0.15);
+      }
+
+      /* Gains */
+      .gains-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .gain-card {
+        background: var(--card);
+        border-radius: var(--radius);
+        padding: 18px 16px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+      .gain-card.total {
+        grid-column: 1/-1;
+        background: linear-gradient(135deg, var(--red), var(--red-mid));
+        border: none;
+      }
+      .gain-title {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 6px;
+      }
+      .gain-card.total .gain-title {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .gain-card:not(.total) .gain-title {
+        color: var(--text-secondary);
+      }
+      .gain-value {
+        font-size: 28px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        letter-spacing: -0.03em;
+      }
+      .gain-card.total .gain-value {
+        color: #fff;
+      }
+      .gain-card:not(.total) .gain-value {
+        color: var(--text);
+        font-size: 22px;
+      }
+      .gain-unit {
+        font-size: 13px;
+        font-weight: 500;
+        opacity: 0.7;
+        margin-left: 4px;
+      }
+      .transaction-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid #f5f5f5;
+      }
+      .transaction-item:last-child {
+        border-bottom: none;
+      }
+      .tx-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+      }
+      .tx-info {
+        flex: 1;
+      }
+      .tx-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .tx-date {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+      .tx-amount {
+        font-size: 15px;
+        font-weight: 800;
+        font-family: var(--font-display);
+      }
+      .tx-amount.credit {
+        color: var(--green);
+      }
+      .tx-amount.pending {
+        color: #f57f17;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+      }
+      .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+      .empty-text {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+      .confetti-piece {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        z-index: 400;
+        pointer-events: none;
+      }
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        display: inline-block;
+      }
+      .msg-toast {
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 13px;
+        margin-bottom: 12px;
+        font-weight: 500;
+        animation: slideDown 0.4s;
+      }
+      .msg-toast.error {
+        background: #ffebee;
+        border: 1px solid #ffcdd2;
+        color: #c62828;
+      }
+      .msg-toast.success {
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        color: #2e7d32;
+      }
+      @media (max-width: 360px) {
+        .commission-amount {
+          font-size: 22px;
+        }
+        .kpi-value {
+          font-size: 22px;
+        }
+        .podium-bar {
+          min-width: 75px;
+        }
+      }
+    </style>
   </head>
-  <body class="bg-gray-50">
-    <div class="max-w-md mx-auto bg-gray-50 min-h-screen pb-20">
-      <!-- Header — ROUGE -->
-      <div
-        class="bg-gradient-to-r from-red-600 to-red-700 text-white p-4 pb-6 rounded-b-3xl shadow-lg"
-      >
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center space-x-3">
-            <div
-              class="w-12 h-12 bg-white/20 backdrop-blur rounded-full flex items-center justify-center"
-            >
-              <i data-lucide="award"></i>
+  <body>
+    <div class="app" id="app">
+      <!-- Toast Container -->
+      <div class="toast-container" id="toastContainer"></div>
+
+      <!-- PAGE: ACCUEIL -->
+      <div class="page active" id="page-accueil">
+        <div class="header">
+          <div class="header-top">
+            <div class="user-info">
+              <div class="avatar" id="userAvatar"></div>
+              <div>
+                <div class="user-name" id="userName"></div>
+                <div class="badges">
+                  <span class="badge-role" id="userLevel"></span>
+                  <span class="badge-rank" id="userRank"></span>
+                </div>
+              </div>
+            </div>
+            <div class="header-actions">
+              <a href="/logout/" class="icon-btn" title="Déconnexion">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="commission-banner">
+            <div>
+              <div class="commission-label">Commission ce mois</div>
+              <div class="commission-amount">
+                <span id="commissionTotal">0</span
+                ><span class="commission-currency">XAF</span>
+              </div>
             </div>
             <div>
-              <div class="font-bold text-lg">{{ ba.name }}</div>
-              <div class="text-xs opacity-90 flex items-center">
-                <span class="bg-white/20 px-2 py-0.5 rounded-full mr-2"
-                  >{{ ba.level }}</span
+              <div class="trend-up">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
-                Rang #{{ ba.rank }}
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+                  <polyline points="17 6 23 6 23 12" />
+                </svg>
+                <span>Live</span>
               </div>
+              <div class="trend-label">données MySQL</div>
             </div>
           </div>
-          <a
-            href="/logout/"
-            class="bg-white/20 px-3 py-2 rounded-full text-xs font-semibold"
-            >Logout</a
+        </div>
+        <div class="content" id="accueilContent">
+          {% if messages %}{% for m in messages %}
+          <div
+            class="msg-toast {% if m.tags == 'error' %}error{% else %}success{% endif %}"
           >
+            {{ m }}
+          </div>
+          {% endfor %}{% endif %}
         </div>
       </div>
 
-      <div class="p-4">
-        {% if messages %}{% for m in messages %}
-        <div
-          class="mb-3 p-3 rounded-lg text-sm {% if m.tags == 'error' %}bg-red-50 border border-red-200 text-red-700{% else %}bg-green-50 border border-green-200 text-green-700{% endif %}"
-        >
-          {{ m }}
-        </div>
-        {% endfor %}{% endif %} {% if tab == "dashboard" %}
-        <!-- Dashboard cards -->
-        <div class="grid grid-cols-2 gap-3">
-          <div
-            class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-4 text-white"
-          >
-            <div class="text-sm opacity-90">Chauffeurs Actifs</div>
-            <div class="text-3xl font-bold mt-1">{{ ba.activeDrivers }}</div>
-            <div class="text-xs mt-1 opacity-80">
-              sur {{ ba.totalDrivers }} recrutés
+      <!-- PAGE: RECRUES -->
+      <div class="page" id="page-recrues">
+        <div class="header" style="padding-bottom: 24px">
+          <div class="header-top">
+            <div style="color: #fff">
+              <div style="font-size: 20px; font-weight: 700">Mes Recrues</div>
+              <div
+                style="font-size: 12px; opacity: 0.7; margin-top: 4px"
+                id="recruesCount"
+              ></div>
             </div>
-          </div>
-          <div
-            class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl p-4 text-white"
-          >
-            <div class="text-sm opacity-90">Commissions Mois</div>
-            <div class="text-2xl font-bold mt-1">
-              {{ ba.monthlyCommission }}
-            </div>
-            <div class="text-xs mt-1 opacity-80">XAF</div>
-          </div>
-          <div
-            class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-4 text-white"
-          >
-            <div class="text-sm opacity-90">Passagers</div>
-            <div class="text-3xl font-bold mt-1">{{ ba.totalPassengers }}</div>
-            <div class="text-xs mt-1 opacity-80">total recrutés</div>
-          </div>
-          <div
-            class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-4 text-white"
-          >
-            <div class="text-sm opacity-90">Série en cours</div>
-            <div class="text-3xl font-bold mt-1">{{ ba.streak }} 🔥</div>
-            <div class="text-xs mt-1 opacity-80">jours consécutifs</div>
+            <button class="icon-btn" onclick="openModal('enrolModal')">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
           </div>
         </div>
-        <!-- Objectif -->
-        <div
-          class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mt-4"
-        >
-          <div class="flex items-center justify-between mb-2">
-            <div class="font-semibold text-gray-800">Objectif Mensuel</div>
-            <div class="text-sm text-gray-500">{{ ba.targetProgress }}%</div>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-            <div
-              class="bg-gradient-to-r from-red-500 to-red-700 h-3 rounded-full"
-              style="width: {{ ba.targetProgress }}%"
-            ></div>
-          </div>
-          <div class="text-xs text-gray-600">Progression en temps réel</div>
-        </div>
+        <div class="content" id="recruesContent"></div>
+      </div>
 
-        {% elif tab == "enroll" %}
-        <div class="space-y-3">
-          <div class="bg-white rounded-xl p-6">
-            <div class="font-bold text-gray-800 text-lg mb-2">
-              Enrôlement Manuel
+      <!-- PAGE: RANKING -->
+      <div class="page" id="page-ranking">
+        <div class="header" style="padding-bottom: 24px">
+          <div class="header-top">
+            <div style="color: #fff">
+              <div style="font-size: 20px; font-weight: 700">Classement</div>
+              <div style="font-size: 12px; opacity: 0.7; margin-top: 4px">
+                Tous les Brand Ambassadors
+              </div>
             </div>
-            <!-- Chauffeur -->
-            <form method="post" action="/app/enroll/driver/" class="space-y-3">
+          </div>
+        </div>
+        <div class="content" id="rankingContent"></div>
+      </div>
+
+      <!-- PAGE: GAINS -->
+      <div class="page" id="page-gains">
+        <div class="header" style="padding-bottom: 24px">
+          <div class="header-top">
+            <div style="color: #fff">
+              <div style="font-size: 20px; font-weight: 700">Mes Gains</div>
+              <div style="font-size: 12px; opacity: 0.7; margin-top: 4px">
+                Historique & Retraits
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content" id="gainsContent"></div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <nav class="bottom-nav">
+        <a
+          href="/app/?tab=dashboard"
+          class="nav-item {% if tab == 'dashboard' %}active{% endif %}"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span class="nav-label">Accueil</span>
+          {% if tab == 'dashboard' %}
+          <div class="nav-dot"></div>
+          {% endif %}
+        </a>
+        <a
+          href="/app/?tab=recruits"
+          class="nav-item {% if tab == 'recruits' %}active{% endif %}"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <span class="nav-label">Recrues</span>
+          {% if tab == 'recruits' %}
+          <div class="nav-dot"></div>
+          {% endif %}
+        </a>
+        <button class="nav-center" onclick="openModal('enrolModal')">
+          <div class="nav-center-btn">
+            <svg
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="8.5" cy="7" r="4" />
+              <line x1="20" y1="8" x2="20" y2="14" />
+              <line x1="23" y1="11" x2="17" y2="11" />
+            </svg>
+          </div>
+          <span class="nav-label">Enrôler</span>
+        </button>
+        <a
+          href="/app/?tab=leaderboard"
+          class="nav-item {% if tab == 'leaderboard' %}active{% endif %}"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+            />
+          </svg>
+          <span class="nav-label">Ranking</span>
+          {% if tab == 'leaderboard' %}
+          <div class="nav-dot"></div>
+          {% endif %}
+        </a>
+        <a
+          href="/app/?tab=commissions"
+          class="nav-item {% if tab == 'commissions' %}active{% endif %}"
+        >
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="1" y="4" width="22" height="16" rx="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          <span class="nav-label">Gains</span>
+          {% if tab == 'commissions' %}
+          <div class="nav-dot"></div>
+          {% endif %}
+        </a>
+      </nav>
+
+      <!-- ENROL MODAL (Driver) -->
+      <div class="modal-overlay" id="enrolModal">
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <div class="modal-header">
+            <div class="modal-title">Enrôler un chauffeur</div>
+            <button class="modal-close" onclick="closeModal('enrolModal')">
+              ✕
+            </button>
+          </div>
+          <div class="modal-body">
+            <form
+              method="post"
+              action="/app/enroll/driver/"
+              id="enrolDriverForm"
+            >
               {% csrf_token %}
-              <div class="font-semibold text-sm text-gray-700">
-                🚕 Chauffeur
-              </div>
-              <input
-                name="name"
-                placeholder="Nom complet"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <input
-                name="phone"
-                placeholder="+242..."
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <div class="space-y-1">
-                <select
-                  name="zone"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                  required
-                >
-                  <option value="">Sélectionner une zone</option>
-                  {% for z in zones %}
-                  <option value="{{ z }}">{{ z }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <input
-                name="address"
-                placeholder="Adresse (quartier, rue, repère...)"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-              />
-              <div class="space-y-1">
+              <div class="form-group">
+                <label class="form-label">Nom complet</label>
                 <input
-                  name="vehicleNumber"
-                  placeholder="Immatriculation (6 car. ex: AB12CD)"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl uppercase"
-                  minlength="6"
-                  maxlength="12"
+                  class="form-input"
+                  name="name"
+                  placeholder="Ex: Jean Makaya"
                   required
                 />
-                <div class="text-[11px] text-gray-500">
-                  6 caractères requis.
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Téléphone</label>
+                  <input
+                    class="form-input"
+                    name="phone"
+                    placeholder="06 XXX XX XX"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Zone</label>
+                  <select class="form-input form-select" name="zone" required>
+                    <option value="">Choisir...</option>
+                    {% for z in zones %}
+                    <option value="{{ z }}">{{ z }}</option>
+                    {% endfor %}
+                  </select>
                 </div>
               </div>
-              <input
-                name="vehicleModel"
-                placeholder="Marque & modèle"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <button
-                class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold py-4 rounded-xl shadow-lg"
-              >
-                Confirmer l'Enrôlement (+1 000 XAF)
+              <div class="form-group">
+                <label class="form-label">Adresse (quartier, rue)</label>
+                <input
+                  class="form-input"
+                  name="address"
+                  placeholder="Quartier, rue, repère..."
+                />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Immatriculation</label>
+                  <input
+                    class="form-input"
+                    name="vehicleNumber"
+                    placeholder="AB12CD"
+                    minlength="6"
+                    maxlength="12"
+                    required
+                    style="text-transform: uppercase"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Marque & modèle</label>
+                  <input
+                    class="form-input"
+                    name="vehicleModel"
+                    placeholder="Toyota Corolla"
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" id="enrolSubmitBtn">
+                Enrôler le chauffeur (+1 000 XAF)
               </button>
             </form>
-          </div>
-        </div>
-
-        {% elif tab == "recruits" %}
-        <div class="space-y-2">
-          {% for r in recruits %}
-          <div class="bg-white border border-gray-200 rounded-xl p-3">
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-semibold text-gray-800">{{ r.name }}</div>
-                <div class="text-xs text-gray-500">
-                  {{ r.type }} • {{ r.date }} • {{ r.status }}
-                </div>
-              </div>
-              <div class="text-xs font-semibold text-green-600">
-                +{{ r.commission }} XAF
-              </div>
+            <div style="height: 1px; background: #eee; margin: 20px 0"></div>
+            <div
+              class="modal-title"
+              style="font-size: 16px; margin-bottom: 14px"
+            >
+              Enrôler un passager
             </div>
-          </div>
-          {% empty %}
-          <div class="text-xs text-gray-500">Aucune recrue.</div>
-          {% endfor %}
-        </div>
-
-        {% elif tab == "leaderboard" %}
-        <div
-          class="bg-white rounded-xl shadow-sm border border-gray-100 divide-y"
-        >
-          {% for item in leaderboard %}
-          <div class="p-4 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-              <div
-                class="w-8 h-8 rounded-full {% if forloop.counter <= 3 %}bg-red-100 text-red-700{% else %}bg-gray-100 text-gray-600{% endif %} flex items-center justify-center font-bold text-sm"
-              >
-                {{ item.rank }}
-              </div>
-              <div class="font-semibold text-gray-800">{{ item.name }}</div>
-            </div>
-            <div class="text-xs text-gray-600">
-              {{ item.total_enrollments }} enrôlements
-            </div>
-          </div>
-          {% empty %}
-          <div class="p-4 text-xs text-gray-500">
-            Classement non disponible.
-          </div>
-          {% endfor %}
-        </div>
-
-        {% elif tab == "commissions" %}
-        <div
-          class="bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl p-6 text-white"
-        >
-          <div class="text-sm opacity-90 mb-1">Total ce Mois</div>
-          <div class="text-4xl font-bold mb-3">
-            {{ ba.monthlyCommission }} XAF
-          </div>
-          <div class="flex items-center justify-between text-sm">
-            <div class="opacity-90">
-              En attente: {{ ba.pendingCommission }} XAF
-            </div>
-            <div class="bg-white/20 px-3 py-1 rounded-full">Live</div>
-          </div>
-        </div>
-        <!-- ✅ NOUVEAU : Bouton Retrait Commission -->
-        <div class="mt-4">
-          <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-            <div class="font-semibold text-gray-800 mb-3">
-              💰 Retrait Commission
-            </div>
-            <form method="post" action="/app/withdraw/" class="space-y-3">
+            <form method="post" action="/app/enroll/passenger/">
               {% csrf_token %}
-              <input
-                name="montant"
-                type="number"
-                min="500"
-                step="100"
-                placeholder="Montant à retirer (XAF)"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <input
-                name="telephone_retrait"
-                placeholder="N° Airtel Money (+242...)"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl"
-                required
-              />
-              <button
-                class="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold py-4 rounded-xl shadow-lg"
-              >
-                Demander le Retrait
+              <div class="form-group">
+                <label class="form-label">Nom complet</label>
+                <input
+                  class="form-input"
+                  name="name"
+                  placeholder="Nom du passager"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Téléphone</label>
+                <input
+                  class="form-input"
+                  name="phone"
+                  placeholder="06 XXX XX XX"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-success">
+                Enrôler le passager (+500 XAF)
               </button>
             </form>
           </div>
         </div>
-        <!-- Historique retraits -->
-        {% if withdrawals %}
-        <div class="mt-4">
-          <div class="font-semibold text-gray-800 mb-2">
-            Historique Retraits
-          </div>
-          <div class="space-y-2">
-            {% for w in withdrawals %}
-            <div class="bg-white border border-gray-200 rounded-xl p-3">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="font-semibold text-gray-800">
-                    {{ w.montant }} XAF
-                  </div>
-                  <div class="text-xs text-gray-500">
-                    {{ w.date }} • {{ w.telephone }}
-                  </div>
-                </div>
-                <div
-                  class="text-xs font-semibold px-2 py-1 rounded-full {% if w.statut == 'PAYÉ' %}bg-green-100 text-green-700{% elif w.statut == 'EN_COURS' %}bg-yellow-100 text-yellow-700{% else %}bg-gray-100 text-gray-600{% endif %}"
-                >
-                  {{ w.statut }}
-                </div>
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %} {% endif %}
       </div>
 
-      <!-- Bottom Nav — ROUGE -->
-      <div
-        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg"
-      >
-        <div class="max-w-md mx-auto grid grid-cols-5">
-          <a
-            href="/app/?tab=dashboard"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'dashboard' %}text-red-600{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="home"></i
-            ><span class="text-xs font-medium">Accueil</span>
-          </a>
-          <a
-            href="/app/?tab=recruits"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'recruits' %}text-red-600{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="users"></i
-            ><span class="text-xs font-medium">Recrues</span>
-          </a>
-          <a href="/app/?tab=enroll" class="relative -mt-4 text-center">
-            <div
-              class="w-16 h-16 rounded-full flex items-center justify-center shadow-lg bg-gradient-to-br from-red-600 to-red-700 mx-auto"
-            >
-              <i data-lucide="user-plus" class="text-white"></i>
+      <!-- WITHDRAW MODAL -->
+      <div class="modal-overlay" id="withdrawModal">
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <div class="modal-header">
+            <div class="modal-title">Retrait de commission</div>
+            <button class="modal-close" onclick="closeModal('withdrawModal')">
+              ✕
+            </button>
+          </div>
+          <div class="modal-body">
+            <div style="text-align: center; margin-bottom: 20px">
+              <div
+                style="
+                  font-size: 12px;
+                  color: var(--text-secondary);
+                  margin-bottom: 4px;
+                "
+              >
+                Solde disponible
+              </div>
+              <div
+                style="
+                  font-size: 36px;
+                  font-weight: 800;
+                  font-family: var(--font-display);
+                  color: var(--green);
+                "
+                id="withdrawBalance"
+              >
+                0 XAF
+              </div>
             </div>
-            <div
-              class="text-xs font-medium mt-1 {% if tab == 'enroll' %}text-red-600{% else %}text-gray-700{% endif %}"
-            >
-              Enrôler
-            </div>
-          </a>
-          <a
-            href="/app/?tab=leaderboard"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'leaderboard' %}text-red-600{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="trending-up"></i
-            ><span class="text-xs font-medium">Ranking</span>
-          </a>
-          <a
-            href="/app/?tab=commissions"
-            class="p-3 flex flex-col items-center space-y-1 {% if tab == 'commissions' %}text-red-600{% else %}text-gray-400{% endif %}"
-          >
-            <i data-lucide="target"></i
-            ><span class="text-xs font-medium">Gains</span>
-          </a>
+            <form method="post" action="/app/withdraw/">
+              {% csrf_token %}
+              <div class="form-group">
+                <label class="form-label">Montant à retirer (XAF)</label>
+                <input
+                  class="form-input"
+                  type="number"
+                  name="montant"
+                  placeholder="Ex: 10000"
+                  min="500"
+                  step="100"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Numéro Airtel Money</label>
+                <input
+                  class="form-input"
+                  type="tel"
+                  name="telephone_retrait"
+                  placeholder="+242 05 XXX XX XX"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-success">
+                Retirer maintenant
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
+
     <script>
-      lucide.createIcons();
+      // ===== DJANGO DATA INJECTION =====
+      const BA = {{ ba_json|safe }};
+      const Store = {
+        user: { name: BA.name, role: BA.level, rank: BA.rank, phone: BA.telephone },
+        recruits: {{ recruits_json|safe }},
+        rankings: {{ rankings_json|safe }},
+        transactions: {{ transactions_json|safe }},
+        streak: BA.streak || 0,
+        objectifCible: 100,
+        targetProgress: BA.targetProgress || 0,
+        monthlyCommission: BA.monthlyCommission || 0,
+        pendingCommission: BA.pendingCommission || 0,
+        totalDrivers: BA.totalDrivers || 0,
+        activeDrivers: BA.activeDrivers || 0,
+        totalPassengers: BA.totalPassengers || 0,
+      };
+
+      // ===== HELPERS =====
+      function getActiveRecruits() { return Store.recruits.filter(r => r.status === 'actif'); }
+      function getPendingRecruits() { return Store.recruits.filter(r => r.status === 'en_attente'); }
+      function getInactiveRecruits() { return Store.recruits.filter(r => r.status === 'inactif'); }
+      function formatMoney(n) { return Math.abs(n).toLocaleString('fr-FR'); }
+      function getInitials(name) { return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+      function getAvatarColor(name) {
+        const colors = ['#E53935','#1565C0','#2E7D32','#F57F17','#7B1FA2','#00838F','#D84315','#4527A0'];
+        let hash = 0; for(let c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash);
+        return colors[Math.abs(hash) % colors.length];
+      }
+
+      // ===== TOAST =====
+      function showToast(msg, type='success') {
+        const icons = { success:'✅', error:'❌', info:'ℹ️' };
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<span style="font-size:18px;flex-shrink:0;">${icons[type]}</span>${msg}`;
+        c.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(-20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3000);
+      }
+
+      // ===== MODALS =====
+      function openModal(id) { document.getElementById(id).classList.add('show'); document.body.style.overflow='hidden'; }
+      function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow=''; }
+      document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if(e.target === m) closeModal(m.id); });
+      });
+
+      // ===== TAB ROUTING =====
+      function initTab() {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || 'dashboard';
+        const tabMap = { dashboard:'accueil', recruits:'recrues', leaderboard:'ranking', commissions:'gains' };
+        const page = tabMap[tab] || 'accueil';
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+
+        if(page === 'accueil') renderAccueil();
+        if(page === 'recrues') renderRecrues();
+        if(page === 'ranking') renderRanking();
+        if(page === 'gains') renderGains();
+      }
+
+      // ===== RENDER: ACCUEIL =====
+      function renderAccueil() {
+        const actifs = Store.activeDrivers;
+        const totalDrivers = Store.totalDrivers;
+        const passengers = Store.totalPassengers;
+        const objPct = Store.targetProgress;
+        const commission = Store.monthlyCommission;
+        const rate = totalDrivers > 0 ? Math.round((actifs / totalDrivers) * 100) : 0;
+
+        document.getElementById('userName').textContent = Store.user.name;
+        document.getElementById('userAvatar').textContent = getInitials(Store.user.name);
+        document.getElementById('userLevel').textContent = Store.user.role;
+        document.getElementById('userRank').textContent = '🏅 Rang #' + Store.user.rank;
+        document.getElementById('commissionTotal').textContent = formatMoney(commission);
+
+        // Keep existing Django messages
+        const msgs = document.getElementById('accueilContent').querySelectorAll('.msg-toast');
+        let msgsHtml = '';
+        msgs.forEach(m => msgsHtml += m.outerHTML);
+
+        const totalRecruits = Store.recruits.length;
+
+        document.getElementById('accueilContent').innerHTML = `
+          ${msgsHtml}
+          <div class="kpi-grid">
+            <a href="/app/?tab=recruits" class="card" style="text-decoration:none;animation:slideUp 0.5s 0.15s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="kpi-top">
+                <div class="kpi-icon red">🚕</div>
+                <span class="kpi-badge ${rate>50?'success':'warning'}">${rate}% actifs</span>
+              </div>
+              <div class="kpi-value">${actifs}</div>
+              <div class="kpi-label">sur ${totalDrivers} chauffeurs</div>
+              <div class="progress-track"><div class="progress-fill" style="width:${rate}%;"></div></div>
+            </a>
+            <div class="card" style="animation:slideUp 0.5s 0.22s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="kpi-top">
+                <div class="kpi-icon green">👥</div>
+              </div>
+              <div class="kpi-value">${passengers}</div>
+              <div class="kpi-label">passagers recrutés</div>
+              <div class="trend-indicator up">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                données en temps réel
+              </div>
+            </div>
+            <div class="card" style="animation:slideUp 0.5s 0.29s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF6F00"><path d="M12 23c-3.9 0-7-3.1-7-7 0-3.2 2.1-5.8 3.5-7.5.4-.5 1.3-.2 1.3.5 0 1.1.8 2 1.8 2 .3 0 .6-.1.8-.2.5-.3.6-.9.4-1.4C11.5 6.8 11 4.3 13 1c.3-.4.9-.5 1.2-.1C17.4 4.3 19 8.3 19 12c0 3.3-1.3 5.5-2.8 7-.4.4-1 .1-1-.4 0-.8-.2-1.6-.7-2.2-.2-.2-.6-.3-.9-.1-1.1.8-1.6 2-1.6 3.2 0 1.9-1.6 3.5-3.5 3.5H12z"/></svg>
+                <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#999;">Série</span>
+              </div>
+              <div class="kpi-value">${Store.streak}</div>
+              <div class="kpi-label">jours consécutifs</div>
+              ${Store.streak === 0 ? '<div style="margin-top:6px;font-size:10px;color:#FF6F00;font-weight:600;background:#FFF3E0;padding:4px 10px;border-radius:8px;display:inline-flex;align-items:center;gap:4px;">⚡ Recrutez pour démarrer !</div>' : ''}
+            </div>
+            <div class="card" style="animation:slideUp 0.5s 0.36s cubic-bezier(0.16,1,0.3,1) backwards;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+                <svg width="72" height="72" style="transform:rotate(-90deg);">
+                  <circle cx="36" cy="36" r="29" fill="none" stroke="#f0f0f0" stroke-width="7"/>
+                  <circle cx="36" cy="36" r="29" fill="none" stroke="${objPct>=100?'#43A047':'#E53935'}" stroke-width="7"
+                    stroke-dasharray="182.21" stroke-dashoffset="${182.21*(1-Math.min(objPct,100)/100)}"
+                    stroke-linecap="round" style="--circumference:182.21;--target-offset:${182.21*(1-Math.min(objPct,100)/100)};animation:circleProgress 1.4s 0.5s cubic-bezier(0.16,1,0.3,1) backwards;"/>
+                </svg>
+                <div style="position:absolute;text-align:center;">
+                  <div style="font-size:18px;font-weight:800;font-family:var(--font-display);color:var(--text);">${Math.min(objPct,100)}%</div>
+                </div>
+              </div>
+              <div style="color:#999;font-size:11px;font-weight:500;margin-top:6px;text-align:center;">Objectif mensuel</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section-title">Actions rapides</div>
+          <div class="quick-actions">
+            <div class="action-btn red" onclick="openModal('enrolModal')">
+              <div class="action-emoji">🚕</div>
+              <div class="action-label">Chauffeur</div>
+            </div>
+            <div class="action-btn blue" onclick="openModal('enrolModal')">
+              <div class="action-emoji">👤</div>
+              <div class="action-label">Passager</div>
+            </div>
+            <a href="/app/?tab=commissions" class="action-btn green" style="text-decoration:none;">
+              <div class="action-emoji">💰</div>
+              <div class="action-label">Mes gains</div>
+            </a>
+          </div>
+
+          <!-- Recent Recruits -->
+          <div class="section-header">
+            <div class="section-title" style="margin-bottom:0">Dernières recrues</div>
+            <a href="/app/?tab=recruits" class="see-all">Tout voir →</a>
+          </div>
+          ${totalRecruits === 0 ? '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Aucune recrue. Enrôlez votre premier chauffeur !</div></div>' :
+          `<div class="activity-list">
+            ${Store.recruits.slice(0,5).map((r,i) => `
+              <div class="activity-item" style="animation:slideUp 0.4s ${0.4+i*0.08}s cubic-bezier(0.16,1,0.3,1) backwards;">
+                <div class="activity-icon recruit">👤</div>
+                <div class="activity-text">
+                  <div class="activity-name">${r.name}</div>
+                  <div class="activity-meta">${r.type} · ${r.date}</div>
+                </div>
+                <div class="status-badge ${r.status==='actif'?'active':'pending'}">
+                  ${r.status==='actif'?'✓ Actif':'⏳ Inscrit'}
+                </div>
+              </div>
+            `).join('')}
+          </div>`}
+
+          <!-- En attente -->
+          ${Store.pendingCommission > 0 ? `
+          <div class="tip-card" style="margin-top:10px;">
+            <div class="tip-emoji">💡</div>
+            <div>
+              <div class="tip-title">Commission en attente</div>
+              <div class="tip-text">${formatMoney(Store.pendingCommission)} XAF en attente de validation.</div>
+            </div>
+          </div>` : ''}
+        `;
+      }
+
+      // ===== RENDER: RECRUES =====
+      let recruitFilter = 'tous';
+      let recruitSearch = '';
+      function renderRecrues() {
+        document.getElementById('recruesCount').textContent = Store.recruits.length + ' recrues enregistrées';
+        let filtered = [...Store.recruits];
+        if(recruitFilter === 'actifs') filtered = filtered.filter(r=>r.status==='actif');
+        if(recruitFilter === 'en_attente') filtered = filtered.filter(r=>r.status==='en_attente');
+        if(recruitFilter === 'inactifs') filtered = filtered.filter(r=>r.status==='inactif');
+        if(recruitSearch) filtered = filtered.filter(r=>r.name.toLowerCase().includes(recruitSearch.toLowerCase()));
+
+        document.getElementById('recruesContent').innerHTML = `
+          <div class="search-bar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Rechercher..." value="${recruitSearch}" oninput="recruitSearch=this.value;renderRecrues();">
+          </div>
+          <div class="filter-pills">
+            ${['tous','actifs','en_attente','inactifs'].map(f => `
+              <button class="pill ${recruitFilter===f?'active':''}" onclick="recruitFilter='${f}';renderRecrues();">
+                ${f==='tous'?'Tous ('+Store.recruits.length+')':f==='actifs'?'Actifs ('+getActiveRecruits().length+')':f==='en_attente'?'En attente ('+getPendingRecruits().length+')':'Inactifs ('+getInactiveRecruits().length+')'}
+              </button>
+            `).join('')}
+          </div>
+          ${filtered.length === 0 ? '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">Aucune recrue trouvée.</div></div>' :
+          filtered.map((r,i) => `
+            <div class="recruit-card" style="animation:slideInRight 0.4s ${i*0.06}s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="recruit-avatar" style="background:${getAvatarColor(r.name)}">${getInitials(r.name)}</div>
+              <div class="recruit-info">
+                <div class="recruit-name">${r.name}</div>
+                <div class="recruit-detail">${r.type} · ${r.date}</div>
+                <div class="recruit-stats">
+                  <div class="recruit-stat">💰 <strong>${formatMoney(r.commission)}</strong> XAF</div>
+                </div>
+              </div>
+              <div class="status-badge ${r.status==='actif'?'active':r.status==='en_attente'?'pending':'inactive'}">
+                ${r.status==='actif'?'Actif':r.status==='en_attente'?'En attente':'Inactif'}
+              </div>
+            </div>
+          `).join('')}
+        `;
+      }
+
+      // ===== RENDER: RANKING =====
+      function renderRanking() {
+        const sorted = [...Store.rankings].sort((a,b)=>b.score-a.score);
+        const top3 = sorted.slice(0,3);
+        const rest = sorted.slice(3);
+        const podiumOrder = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
+        const heights = [120, 160, 100];
+        const medals = ['🥈','🥇','🥉'];
+        const bgColors = ['linear-gradient(180deg,#78909C,#546E7A)','linear-gradient(180deg,#FFB300,#FF8F00)','linear-gradient(180deg,#A1887F,#8D6E63)'];
+
+        document.getElementById('rankingContent').innerHTML = `
+          ${top3.length >= 3 ? `
+          <div class="podium">
+            ${podiumOrder.map((p,i) => `
+              <div class="podium-item" style="animation:slideUp 0.5s ${0.1+i*0.12}s cubic-bezier(0.16,1,0.3,1) backwards;">
+                <div class="podium-medal">${medals[i]}</div>
+                <div class="podium-bar" style="background:${bgColors[i]};height:${heights[i]}px;">
+                  <div class="podium-avatar" style="background:${getAvatarColor(p.name)}">${getInitials(p.name)}</div>
+                  <div class="podium-name">${p.name.split(' ')[0]}</div>
+                  <div class="podium-score">${p.recruits}</div>
+                  <div style="font-size:9px;color:rgba(255,255,255,0.7);margin-top:2px;">recrues</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>` : ''}
+          <div class="section-title">Classement complet</div>
+          ${sorted.length === 0 ? '<div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-text">Classement non disponible.</div></div>' :
+          sorted.map((p,i) => `
+            <div class="rank-list-item ${p.isYou?'rank-you':''}" style="animation:slideUp 0.4s ${0.3+i*0.05}s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="rank-number">${i<3?['🥇','🥈','🥉'][i]:(i+1)}</div>
+              <div class="rank-avatar" style="background:${getAvatarColor(p.name)}">${getInitials(p.name)}</div>
+              <div class="rank-info">
+                <div class="rank-name">${p.name} ${p.isYou?'<span style="font-size:10px;color:var(--red-mid);font-weight:700;"> (Vous)</span>':''}</div>
+                <div class="rank-recruits">${p.recruits} enrôlements</div>
+              </div>
+              <div class="rank-score">${p.recruits}</div>
+            </div>
+          `).join('')}
+        `;
+      }
+
+      // ===== RENDER: GAINS =====
+      function renderGains() {
+        const total = Store.monthlyCommission;
+        const pending = Store.pendingCommission;
+        const available = total;
+
+        document.getElementById('gainsContent').innerHTML = `
+          <div class="gains-summary">
+            <div class="gain-card total" style="animation:slideUp 0.5s 0.1s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="gain-title">Commission ce mois</div>
+              <div class="gain-value">${formatMoney(total)}<span class="gain-unit">XAF</span></div>
+            </div>
+            <div class="gain-card" style="animation:slideUp 0.5s 0.2s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="gain-title">Chauffeurs</div>
+              <div class="gain-value">${Store.totalDrivers}</div>
+            </div>
+            <div class="gain-card" style="animation:slideUp 0.5s 0.25s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="gain-title">En attente</div>
+              <div class="gain-value" style="color:#F57F17;">${formatMoney(pending)}<span class="gain-unit">XAF</span></div>
+            </div>
+          </div>
+
+          <button class="btn btn-success" style="margin-bottom:24px;" onclick="openModal('withdrawModal');document.getElementById('withdrawBalance').textContent='${formatMoney(available)} XAF';">
+            💸 Retirer mes gains
+          </button>
+
+          ${Store.transactions.length > 0 ? `
+          <div class="section-title">Historique des retraits</div>
+          <div style="background:var(--card);border-radius:var(--radius);padding:4px 16px;box-shadow:var(--shadow);border:1px solid var(--border);">
+            ${Store.transactions.map((t,i) => `
+              <div class="transaction-item" style="animation:slideUp 0.3s ${0.3+i*0.05}s cubic-bezier(0.16,1,0.3,1) backwards;">
+                <div class="tx-icon" style="background:var(--red-bg)">💸</div>
+                <div class="tx-info">
+                  <div class="tx-label">${t.label}</div>
+                  <div class="tx-date">${t.date} · ${t.status}</div>
+                </div>
+                <div class="tx-amount">${formatMoney(t.amount)} <span style="font-size:11px;font-weight:500;">XAF</span></div>
+              </div>
+            `).join('')}
+          </div>` : '<div class="empty-state"><div class="empty-icon">💰</div><div class="empty-text">Aucun retrait pour le moment.</div></div>'}
+        `;
+      }
+
+      // ===== INIT =====
+      document.addEventListener('DOMContentLoaded', () => {
+        initTab();
+        // Show success messages
+        {% if messages %}{% for m in messages %}
+        showToast("{{ m|escapejs }}", "{% if m.tags == 'error' %}error{% else %}success{% endif %}");
+        {% endfor %}{% endif %}
+      });
     </script>
   </body>
 </html>
