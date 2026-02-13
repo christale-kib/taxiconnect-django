@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TaxiConnect — Manager Dashboard</title>
+<meta name="csrf-token" content="{{ csrf_token }}">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary:#1A1F2E; --bg-secondary:#1E2536; --bg-card:#252D40; --bg-card-hover:#2C3550;
+  --bg-elevated:#313B52; --border:#3A4562; --border-light:#47536E;
+  --text-primary:#F4F6FB; --text-secondary:#9BA5C0; --text-tertiary:#6B7894;
+  --red:#E53935; --red-dim:rgba(229,57,53,0.12); --red-glow:rgba(229,57,53,0.25);
+  --green:#34D399; --green-dim:rgba(52,211,153,0.12); --green-glow:rgba(52,211,153,0.2);
+  --amber:#FBBF24; --amber-dim:rgba(251,191,36,0.12);
+  --blue:#60A5FA; --blue-dim:rgba(96,165,250,0.12);
+  --purple:#A78BFA; --purple-dim:rgba(167,139,250,0.12);
+  --cyan:#22D3EE; --cyan-dim:rgba(34,211,238,0.12);
+  --font-display:'Outfit',sans-serif; --font-body:'DM Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --radius:16px; --radius-sm:10px; --radius-xs:6px;
+  --shadow:0 4px 24px rgba(0,0,0,0.3); --shadow-lg:0 8px 40px rgba(0,0,0,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--font-body);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+button{font-family:var(--font-body);cursor:pointer;}
+input,select{font-family:var(--font-body);}
+
+/* === Layout === */
+.app{display:flex;min-height:100vh;}
+.sidebar{width:240px;background:var(--bg-secondary);border-right:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);}
+.main{flex:1;margin-left:240px;min-height:100vh;}
+.topbar{position:sticky;top:0;z-index:40;background:rgba(26,31,46,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.page-content{padding:20px 24px 40px;}
+
+/* === Sidebar === */
+.sidebar-logo{padding:0 20px 24px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.sidebar-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--red),#FF6F61);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.sidebar-logo-text{font-family:var(--font-display);font-weight:800;font-size:15px;color:var(--text-primary);letter-spacing:-0.02em;}
+.sidebar-logo-sub{font-size:9px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.08em;margin-top:1px;}
+.sidebar-section{padding:12px 12px 4px;font-size:9px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.1em;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:13px;font-weight:500;border:none;background:none;width:calc(100% - 16px);text-align:left;transition:all 0.15s;}
+.sidebar-item:hover{background:var(--bg-card);color:var(--text-primary);}
+.sidebar-item.active{background:var(--red-dim);color:var(--red);font-weight:600;}
+.sidebar-item.active svg{color:var(--red);}
+.sidebar-item svg{color:var(--text-tertiary);transition:color 0.15s;flex-shrink:0;}
+.sidebar-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;}
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border);}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius-sm);cursor:pointer;transition:background 0.15s;}
+.sidebar-user:hover{background:var(--bg-card);}
+.sidebar-avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--red),#FF6F61);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:13px;color:#fff;}
+.sidebar-user-name{font-size:12px;font-weight:600;color:var(--text-primary);}
+.sidebar-user-role{font-size:10px;color:var(--text-tertiary);margin-top:1px;}
+
+/* Mobile hamburger */
+.hamburger{display:none;background:none;border:none;color:var(--text-primary);padding:4px;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:49;}
+
+/* === Topbar === */
+.topbar-title{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:-0.02em;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.topbar-search{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;min-width:200px;transition:border-color 0.2s;}
+.topbar-search:focus-within{border-color:var(--red);}
+.topbar-search input{background:none;border:none;color:var(--text-primary);font-size:12px;outline:none;width:100%;}
+.topbar-search input::placeholder{color:var(--text-tertiary);}
+.topbar-btn{width:34px;height:34px;border-radius:var(--radius-sm);background:var(--bg-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text-secondary);position:relative;transition:all 0.15s;}
+.topbar-btn:hover{background:var(--bg-elevated);color:var(--text-primary);}
+.topbar-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:var(--red);border-radius:50%;border:2px solid var(--bg-primary);}
+.period-selector{display:flex;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.period-btn{padding:7px 12px;font-size:11px;font-weight:600;color:var(--text-tertiary);background:none;border:none;transition:all 0.15s;}
+.period-btn:hover{color:var(--text-secondary);}
+.period-btn.active{background:var(--red-dim);color:var(--red);}
+
+/* === Cards & Grids === */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.kpi{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all 0.2s;position:relative;overflow:hidden;}
+.kpi:hover{border-color:var(--border-light);background:var(--bg-card-hover);}
+.kpi-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.kpi-icon{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.kpi-change{font-size:10px;font-weight:700;padding:3px 7px;border-radius:var(--radius-xs);display:flex;align-items:center;gap:3px;}
+.kpi-change.up{background:var(--green-dim);color:var(--green);}
+.kpi-change.down{background:var(--red-dim);color:var(--red);}
+.kpi-change.neutral{background:var(--amber-dim);color:var(--amber);}
+.kpi-value{font-size:26px;font-weight:800;font-family:var(--font-display);letter-spacing:-0.03em;line-height:1;}
+.kpi-label{font-size:11px;color:var(--text-secondary);margin-top:4px;font-weight:500;}
+.kpi-sparkline{margin-top:10px;height:32px;}
+.kpi-glow{position:absolute;top:-30px;right:-30px;width:80px;height:80px;border-radius:50%;filter:blur(30px);opacity:0.15;pointer-events:none;}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px;}
+
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.card-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);}
+.card-title{font-size:13px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px;}
+.card-action{font-size:11px;color:var(--text-tertiary);font-weight:600;border:none;background:none;display:flex;align-items:center;gap:4px;transition:color 0.15s;}
+.card-action:hover{color:var(--text-secondary);}
+.card-body{padding:16px;}
+
+/* === Table === */
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:10px 12px;font-size:10px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:10px 12px;border-bottom:1px solid rgba(42,49,72,0.5);vertical-align:middle;white-space:nowrap;}
+tr:hover td{background:rgba(255,255,255,0.01);}
+.table-avatar{width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;vertical-align:middle;margin-right:8px;}
+.table-name{font-weight:600;color:var(--text-primary);}
+.table-sub{font-size:10px;color:var(--text-tertiary);margin-top:1px;}
+.table-mono{font-family:var(--font-mono);font-weight:700;font-size:12px;}
+.table-bar{height:4px;border-radius:4px;background:var(--bg-elevated);overflow:hidden;min-width:60px;}
+.table-bar-fill{height:100%;border-radius:4px;transition:width 0.6s ease;}
+.badge{padding:3px 8px;border-radius:var(--radius-xs);font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:3px;}
+.badge.green{background:var(--green-dim);color:var(--green);}
+.badge.red{background:var(--red-dim);color:var(--red);}
+.badge.amber{background:var(--amber-dim);color:var(--amber);}
+.badge.blue{background:var(--blue-dim);color:var(--blue);}
+.badge.purple{background:var(--purple-dim);color:var(--purple);}
+
+/* === Charts (CSS-based) === */
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:140px;padding-top:8px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar{border-radius:4px 4px 0 0;width:100%;min-height:2px;transition:height 0.8s cubic-bezier(0.16,1,0.3,1);}
+.bar-val{font-size:9px;font-weight:700;font-family:var(--font-mono);color:var(--text-secondary);}
+.bar-lbl{font-size:9px;color:var(--text-tertiary);font-weight:600;}
+
+.donut-container{display:flex;align-items:center;gap:20px;}
+.donut-legend{display:flex;flex-direction:column;gap:8px;}
+.donut-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-secondary);}
+.donut-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
+.donut-item-val{margin-left:auto;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);}
+
+/* Heatmap */
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.heat-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;font-family:var(--font-mono);color:transparent;transition:all 0.15s;cursor:pointer;}
+.heat-cell:hover{color:var(--text-primary);transform:scale(1.15);}
+.heat-header{font-size:8px;color:var(--text-tertiary);font-weight:700;text-align:center;display:flex;align-items:center;justify-content:center;background:none !important;}
+
+/* Activity Feed */
+.feed-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(42,49,72,0.4);}
+.feed-item:last-child{border-bottom:none;}
+.feed-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.feed-text{font-size:12px;color:var(--text-secondary);line-height:1.45;}
+.feed-text strong{color:var(--text-primary);font-weight:600;}
+.feed-time{font-size:10px;color:var(--text-tertiary);margin-top:2px;}
+
+/* Alert cards */
+.alert-card{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-sm);margin-bottom:8px;transition:background 0.15s;cursor:pointer;}
+.alert-card:hover{background:var(--bg-elevated);}
+.alert-icon{width:34px;height:34px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.alert-info{flex:1;min-width:0;}
+.alert-title{font-size:12px;font-weight:600;color:var(--text-primary);}
+.alert-desc{font-size:10px;color:var(--text-tertiary);margin-top:2px;}
+.alert-action{font-size:10px;color:var(--red);font-weight:700;background:none;border:none;white-space:nowrap;}
+
+/* Target tracker */
+.target-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(42,49,72,0.4);}
+.target-row:last-child{border-bottom:none;}
+.target-label{font-size:12px;color:var(--text-secondary);min-width:90px;}
+.target-bar{flex:1;height:6px;background:var(--bg-elevated);border-radius:6px;overflow:hidden;}
+.target-bar-fill{height:100%;border-radius:6px;transition:width 0.8s ease;}
+.target-val{font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--text-primary);min-width:50px;text-align:right;}
+
+/* Zone map (simplified) */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.zone-card{background:var(--bg-elevated);border-radius:var(--radius-sm);padding:12px;cursor:pointer;transition:all 0.15s;border:1px solid transparent;}
+.zone-card:hover{border-color:var(--border-light);}
+.zone-name{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:6px;}
+.zone-stats{display:flex;gap:12px;}
+.zone-stat{font-size:10px;color:var(--text-tertiary);}
+.zone-stat strong{color:var(--text-secondary);font-family:var(--font-mono);}
+
+/* === Modal === */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:none;align-items:center;justify-content:center;animation:fadeIn 0.2s;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;width:92%;max-width:500px;max-height:85vh;overflow-y:auto;animation:scaleIn 0.3s cubic-bezier(0.16,1,0.3,1);}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);}
+.modal-title{font-size:16px;font-weight:700;}
+.modal-close{width:28px;height:28px;border-radius:8px;background:var(--bg-elevated);border:none;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;}
+.modal-close:hover{background:var(--border);color:var(--text-primary);}
+.modal-body{padding:20px;}
+
+/* === Animations === */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.anim-up{animation:slideUp 0.5s cubic-bezier(0.16,1,0.3,1) backwards;}
+.anim-d1{animation-delay:0.05s}.anim-d2{animation-delay:0.1s}.anim-d3{animation-delay:0.15s}.anim-d4{animation-delay:0.2s}
+.anim-d5{animation-delay:0.25s}.anim-d6{animation-delay:0.3s}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 1.5s ease-in-out infinite;margin-right:6px;}
+
+/* === Responsive === */
+@media(max-width:1024px){
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-overlay.show{display:block;}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+  .topbar-search{min-width:120px;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .kpi-row{grid-template-columns:1fr;}
+  .page-content{padding:16px 14px 40px;}
+  .topbar{padding:10px 14px;}
+}
+
+/* Toast */
+.toast-c{position:fixed;top:16px;right:16px;z-index:300;display:flex;flex-direction:column;gap:8px;}
+.toast{padding:12px 16px;border-radius:var(--radius-sm);font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px;animation:slideUp 0.3s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--shadow-lg);}
+.toast.success{background:#065F46;color:var(--green);}
+.toast.error{background:#7F1D1D;color:#FCA5A5;}
+.toast.info{background:#1E3A5F;color:var(--blue);}
+
+/* === Driver perf gauge === */
+.gauge-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.gauge-ring svg{transform:rotate(-90deg);}
+.gauge-center{position:absolute;text-align:center;}
+.gauge-val{font-size:16px;font-weight:800;font-family:var(--font-display);}
+.gauge-sub{font-size:8px;color:var(--text-tertiary);margin-top:1px;}
+
+/* === Tabs inside cards === */
+.card-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 16px;}
+.card-tab{padding:10px 14px;font-size:12px;font-weight:600;color:var(--text-tertiary);border:none;background:none;cursor:pointer;position:relative;transition:color 0.15s;}
+.card-tab:hover{color:var(--text-secondary);}
+.card-tab.active{color:var(--red);}
+.card-tab.active::after{content:'';position:absolute;bottom:-1px;left:14px;right:14px;height:2px;background:var(--red);border-radius:2px;}
+
+/* === Config / Form styles (dark) === */
+.cfg-section{margin-bottom:24px;}
+.cfg-section-title{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.cfg-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-elevated);border-radius:var(--radius-sm);margin-bottom:8px;transition:background 0.15s;}
+.cfg-row:hover{background:var(--bg-card-hover);}
+.cfg-label{flex:1;font-size:12px;color:var(--text-secondary);font-weight:500;}
+.cfg-label strong{color:var(--text-primary);font-weight:600;}
+.cfg-input{width:72px;padding:7px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);font-family:var(--font-mono);font-size:13px;font-weight:700;text-align:center;outline:none;transition:border-color 0.2s;}
+.cfg-input:focus{border-color:var(--red);}
+.cfg-select{padding:7px 10px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text-primary);font-family:var(--font-body);font-size:12px;font-weight:600;outline:none;cursor:pointer;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238B95B0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color 0.2s;}
+.cfg-select:focus{border-color:var(--red);}
+.cfg-toggle{position:relative;width:40px;height:22px;background:var(--border);border-radius:20px;cursor:pointer;transition:background 0.2s;border:none;flex-shrink:0;}
+.cfg-toggle.on{background:var(--green);}
+.cfg-toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform 0.2s;}
+.cfg-toggle.on::after{transform:translateX(18px);}
+.cfg-hint{font-size:10px;color:var(--text-tertiary);margin-top:2px;}
+.cfg-btn{padding:8px 16px;border-radius:var(--radius-xs);font-size:12px;font-weight:700;border:none;cursor:pointer;transition:all 0.15s;font-family:var(--font-body);}
+.cfg-btn:active{transform:scale(0.96);}
+.cfg-btn.primary{background:var(--red);color:#fff;box-shadow:0 2px 12px var(--red-glow);}
+.cfg-btn.secondary{background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border);}
+.cfg-btn.success{background:var(--green-dim);color:var(--green);}
+
+/* Score stars */
+.stars{display:inline-flex;gap:1px;font-size:12px;letter-spacing:1px;}
+
+/* Perf distribution mini bars */
+.perf-mini-bars{display:flex;height:6px;border-radius:6px;overflow:hidden;gap:1px;}
+.perf-mini-bar{height:100%;transition:width 0.6s ease;}</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Toast -->
+<div class="toast-c" id="toastC"></div>
+
+<!-- Sidebar Overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- === SIDEBAR === -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div>
+      <div class="sidebar-logo-text">Airtel Money</div>
+      <div class="sidebar-logo-sub">Manager Portal</div>
+    </div>
+  </div>
+
+  <div class="sidebar-section">Principal</div>
+  <button class="sidebar-item active" onclick="goPage('dashboard',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </button>
+  <button class="sidebar-item" onclick="goPage('ambassadors',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Ambassadeurs
+    <span class="sidebar-badge" id="baBadge">12</span>
+  </button>
+  <button class="sidebar-item" onclick="goPage('performance',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Performance
+  </button>
+  <button class="sidebar-item" onclick="goPage('territories',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    Territoires
+  </button>
+  <button class="sidebar-item" onclick="goPage('drivers',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+    Chauffeurs
+    <span class="sidebar-badge" style="background:var(--blue);">44</span>
+  </button>
+
+  <div class="sidebar-section">Gestion</div>
+  <button class="sidebar-item" onclick="goPage('alerts',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    Alertes
+    <span class="sidebar-badge">5</span>
+  </button>
+  <button class="sidebar-item" onclick="goPage('targets',this)">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    Objectifs
+  </button>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user" onclick="toast('Profil Manager','info')">
+      <div class="sidebar-avatar">{{ manager_name|truncatechars:2 }}</div>
+      <div>
+        <div class="sidebar-user-name">{{ manager_name }}</div>
+        <div class="sidebar-user-role">Regional Manager</div>
+      </div>
+    </div>
+    <a href="{% url 'manager_logout' %}" style="display:block;text-align:center;margin-top:10px;padding:8px;border-radius:8px;background:rgba(239,68,68,0.1);color:#ef4444;font-size:12px;font-weight:600;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">↪ Déconnexion</a>
+  </div>
+</nav>
+
+<!-- === MAIN === -->
+<div class="main">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div>
+        <div class="topbar-title" id="pageTitle">Dashboard</div>
+        <div style="font-size:10px;color:var(--text-tertiary);margin-top:1px;"><span class="live-dot"></span>Données en temps réel · 10 Fév 2026</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Rechercher..." id="globalSearch" oninput="handleSearch(this.value)">
+      </div>
+      <div class="period-selector">
+        <button class="period-btn" onclick="setPeriod('semaine',this)">7J</button>
+        <button class="period-btn active" onclick="setPeriod('mois',this)">30J</button>
+        <button class="period-btn" onclick="setPeriod('trimestre',this)">90J</button>
+      </div>
+      <button class="topbar-btn" onclick="toast('Export PDF en cours...','info')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button class="topbar-btn" onclick="toast('Notifications','info')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="dot"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div class="page-content" id="pageContent"></div>
+</div>
+
+</div>
+
+<!-- BA Detail Modal -->
+<div class="modal-overlay" id="baModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="baModalTitle">Détail Ambassadeur</div>
+      <button class="modal-close" onclick="closeModal('baModal')">✕</button>
+    </div>
+    <div class="modal-body" id="baModalBody"></div>
+  </div>
+</div>
+
+<!-- Driver Detail Modal -->
+<div class="modal-overlay" id="driverModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="driverModalTitle">Détail Chauffeur</div>
+      <button class="modal-close" onclick="closeModal('driverModal')">✕</button>
+    </div>
+    <div class="modal-body" id="driverModalBody"></div>
+  </div>
+</div>
+
+<!-- Objective Config Modal -->
+<div class="modal-overlay" id="cfgModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <div class="modal-title" id="cfgModalTitle">Configurer objectif</div>
+      <button class="modal-close" onclick="closeModal('cfgModal')">✕</button>
+    </div>
+    <div class="modal-body" id="cfgModalBody"></div>
+  </div>
+</div>
+
+<script id="dashData" type="application/json">{{ dashboard_data_json|safe }}</script>
+<script>
+// ===================== DATA =====================
+const D = JSON.parse(document.getElementById("dashData").textContent);
+
+// Computed
+const totalBAs = D.ambassadors.length;
+const totalRecruits = D.ambassadors.reduce((s,a)=>s+a.recruits,0);
+const totalActive = D.ambassadors.reduce((s,a)=>s+a.active,0);
+const totalCommission = D.ambassadors.reduce((s,a)=>s+a.commission,0);
+const totalPassengers = D.ambassadors.reduce((s,a)=>s+a.passengers,0);
+const avgActivation = totalRecruits>0?Math.round((totalActive/totalRecruits)*100):0;
+const avgComPerBA = Math.round(totalCommission/totalBAs);
+const topPerformers = D.ambassadors.filter(a=>a.status==='top').length;
+const atRisk = D.ambassadors.filter(a=>a.status==='risk').length;
+
+// Helpers
+function fmt(n){return n.toLocaleString('fr-FR');}
+function pct(v,t){return t>0?Math.round((v/t)*100):0;}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+function avatarColor(n){const c=['#E53935','#1565C0','#2E7D32','#F57F17','#7B1FA2','#00838F','#D84315','#4527A0','#0097A7','#558B2F','#AD1457','#6A1B9A'];let h=0;for(let c2 of n)h=c2.charCodeAt(0)+((h<<5)-h);return c[Math.abs(h)%c.length];}
+function statusBadge(s){return s==='top'?'<span class="badge green">★ Top</span>':s==='good'?'<span class="badge blue">● Bon</span>':s==='watch'?'<span class="badge amber">◉ À suivre</span>':s==='risk'?'<span class="badge red">▲ À risque</span>':'<span class="badge purple">◆ Nouveau</span>';}
+function driverStatusBadge(s){return s==='actif'?'<span class="badge green">● Actif</span>':s==='en_attente'?'<span class="badge amber">◎ En attente</span>':'<span class="badge red">○ Inactif</span>';}
+function ratingStars(r){if(!r)return'<span style="color:var(--text-tertiary);font-size:10px;">—</span>';const full=Math.floor(r);const half=r%1>=0.5?1:0;return`<span class="stars">${'★'.repeat(full)}${half?'½':''}${'☆'.repeat(5-full-half)}</span><span style="font-family:var(--font-mono);font-weight:700;font-size:11px;margin-left:4px;">${r.toFixed(1)}</span>`;}
+function perfColor(v,thresholds){return v>=thresholds[0]?'var(--green)':v>=thresholds[1]?'var(--amber)':'var(--red)';}
+function gaugeSVG(value,max,color,size=56){const r=(size-8)/2;const c=2*Math.PI*r;const p=Math.min(value/max,1);const offset=c*(1-p);return`<div class="gauge-ring"><svg width="${size}" height="${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--bg-elevated)" stroke-width="5"/><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="5" stroke-dasharray="${c}" stroke-dashoffset="${offset}" stroke-linecap="round" style="transition:stroke-dashoffset 0.8s ease;"/></svg><div class="gauge-center"><div class="gauge-val" style="color:${color}">${typeof value==='number'&&value%1?value.toFixed(1):value}</div></div></div>`;}
+function trendArrow(t){return t>0?`<span class="kpi-change up">↑ +${t}%</span>`:t<0?`<span class="kpi-change down">↓ ${t}%</span>`:'<span class="kpi-change neutral">→ 0%</span>';}
+function sparkSVG(data,color,w=100,h=28){const max=Math.max(...data,1),min=Math.min(...data),r=max-min||1;const pts=data.map((v,i)=>`${4+(i/(data.length-1))*(w-8)},${h-4-((v-min)/r)*(h-8)}`).join(' ');return`<svg width="${w}" height="${h}" style="overflow:visible"><defs><linearGradient id="sg${color.replace(/[^a-z0-9]/gi,'')}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.3"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs><polygon points="4,${h-4} ${pts} ${w-4},${h-4}" fill="url(#sg${color.replace(/[^a-z0-9]/gi,'')})" /><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+
+// Computed drivers
+function drvActive(){return D.drivers.filter(d=>d.status==='actif');}
+function drvInactive(){return D.drivers.filter(d=>d.status==='inactif');}
+function drvPending(){return D.drivers.filter(d=>d.status==='en_attente');}
+function drvTotalTrips(){return D.drivers.reduce((s,d)=>s+d.trips,0);}
+function drvTotalRev(){return D.drivers.reduce((s,d)=>s+d.revenue,0);}
+function drvAvgRating(){const rated=D.drivers.filter(d=>d.rating>0);return rated.length?+(rated.reduce((s,d)=>s+d.rating,0)/rated.length).toFixed(1):0;}
+
+function toast(msg,type='success'){const c=document.getElementById('toastC');const t=document.createElement('div');t.className='toast '+type;t.innerHTML=({success:'✅',error:'❌',info:'ℹ️'}[type]||'ℹ️')+' '+msg;c.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},3000);}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('show');}
+function setPeriod(p,el){document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');toast(`Période: ${p}`,'info');}
+function handleSearch(v){/* Could filter tables */}
+
+// ===================== PAGES =====================
+let currentPage='dashboard';
+function goPage(page,btn){
+  currentPage=page;
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.getElementById('pageTitle').textContent={dashboard:'Dashboard',ambassadors:'Ambassadeurs',performance:'Performance',territories:'Territoires',drivers:'Chauffeurs',alerts:'Alertes & Risques',targets:'Objectifs & Configuration'}[page]||page;
+  const fn={dashboard:renderDashboard,ambassadors:renderAmbassadors,performance:renderPerformance,territories:renderTerritories,drivers:renderDrivers,alerts:renderAlerts,targets:renderTargets}[page];
+  if(fn)fn();
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+  window.scrollTo(0,0);
+}
+
+// ========== DASHBOARD ==========
+function renderDashboard(){
+  const el=document.getElementById('pageContent');
+  const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const maxE=Math.max(...D.weeklyEnrolments);
+
+  el.innerHTML=`
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi anim-up anim-d1">
+      <div class="kpi-glow" style="background:var(--red);"></div>
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--red-dim);">👥</div>${trendArrow(8)}</div>
+      <div class="kpi-value">${totalBAs}</div>
+      <div class="kpi-label">Brand Ambassadeurs</div>
+      <div class="kpi-sparkline">${sparkSVG([8,9,9,10,10,11,12],'var(--red)')}</div>
+    </div>
+    <div class="kpi anim-up anim-d2">
+      <div class="kpi-glow" style="background:var(--green);"></div>
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--green-dim);">🚕</div>${trendArrow(15)}</div>
+      <div class="kpi-value">${totalRecruits}</div>
+      <div class="kpi-label">Chauffeurs recrutés</div>
+      <div class="kpi-sparkline">${sparkSVG([28,32,35,38,40,42,44],'var(--green)')}</div>
+    </div>
+    <div class="kpi anim-up anim-d3">
+      <div class="kpi-glow" style="background:var(--amber);"></div>
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--amber-dim);">💰</div>${trendArrow(12)}</div>
+      <div class="kpi-value">${fmt(totalCommission)}</div>
+      <div class="kpi-label">Commissions totales (XAF)</div>
+      <div class="kpi-sparkline">${sparkSVG(D.monthlyRevenue,'var(--amber)',100,28)}</div>
+    </div>
+    <div class="kpi anim-up anim-d4">
+      <div class="kpi-glow" style="background:var(--blue);"></div>
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--blue-dim);">📊</div>${trendArrow(avgActivation>50?5:-3)}</div>
+      <div class="kpi-value">${avgActivation}%</div>
+      <div class="kpi-label">Taux d'activation moyen</div>
+      <div class="kpi-sparkline">${sparkSVG([45,48,52,55,50,58,avgActivation],'var(--blue)')}</div>
+    </div>
+  </div>
+
+  <!-- Second row KPIs -->
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);">
+    <div class="kpi anim-up anim-d3" style="padding:12px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div class="kpi-label" style="margin:0;">Passagers total</div><div class="kpi-value" style="font-size:20px;margin-top:4px;">${fmt(totalPassengers)}</div></div>
+        <div class="kpi-icon" style="background:var(--purple-dim);">🧳</div>
+      </div>
+    </div>
+    <div class="kpi anim-up anim-d4" style="padding:12px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div class="kpi-label" style="margin:0;">Comm. moy/BA</div><div class="kpi-value" style="font-size:20px;margin-top:4px;">${fmt(avgComPerBA)}</div></div>
+        <div class="kpi-icon" style="background:var(--cyan-dim);">📈</div>
+      </div>
+    </div>
+    <div class="kpi anim-up anim-d5" style="padding:12px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div class="kpi-label" style="margin:0;">Top performers</div><div class="kpi-value" style="font-size:20px;margin-top:4px;color:var(--green);">${topPerformers}</div></div>
+        <div class="kpi-icon" style="background:var(--green-dim);">🏆</div>
+      </div>
+    </div>
+    <div class="kpi anim-up anim-d6" style="padding:12px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div class="kpi-label" style="margin:0;">À risque</div><div class="kpi-value" style="font-size:20px;margin-top:4px;color:var(--red);">${atRisk}</div></div>
+        <div class="kpi-icon" style="background:var(--red-dim);">⚠️</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts row -->
+  <div class="grid-3">
+    <div class="card anim-up anim-d3">
+      <div class="card-header">
+        <div class="card-title">📊 Enrôlements hebdomadaires</div>
+        <button class="card-action" onclick="goPage('performance',document.querySelectorAll('.sidebar-item')[2])">Détail →</button>
+      </div>
+      <div class="card-body">
+        <div class="bar-chart">
+          ${D.weeklyEnrolments.map((v,i)=>`<div class="bar-col"><div class="bar-val">${v}</div><div class="bar" style="height:${(v/maxE)*110}px;background:${i===D.weeklyEnrolments.length-1?'linear-gradient(180deg,var(--red),#FF6F61)':'linear-gradient(180deg,rgba(229,57,53,0.4),rgba(229,57,53,0.15))'};"></div><div class="bar-lbl">${days[i]}</div></div>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-tertiary);">Total semaine: <strong style="color:var(--text-primary);font-family:var(--font-mono);">${D.weeklyEnrolments.reduce((a,b)=>a+b,0)}</strong></div>
+          <div style="font-size:11px;color:var(--green);font-weight:600;">↑ +18% vs sem. préc.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card anim-up anim-d4">
+      <div class="card-header">
+        <div class="card-title">⚡ Activité en direct</div>
+        <button class="card-action"><span class="live-dot"></span>Live</button>
+      </div>
+      <div class="card-body" style="max-height:220px;overflow-y:auto;">
+        ${D.activity.slice(0,6).map(a=>`<div class="feed-item"><div class="feed-dot" style="background:${a.color};"></div><div><div class="feed-text">${a.text}</div><div class="feed-time">${a.time}</div></div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- Top BAs + Alerts -->
+  <div class="grid-2">
+    <div class="card anim-up anim-d4">
+      <div class="card-header">
+        <div class="card-title">🏆 Top 5 Ambassadeurs</div>
+        <button class="card-action" onclick="goPage('ambassadors',document.querySelectorAll('.sidebar-item')[1])">Tout voir →</button>
+      </div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap"><table>
+          <thead><tr><th>#</th><th>Ambassadeur</th><th>Recrues</th><th>Commission</th><th>Perf.</th></tr></thead>
+          <tbody>
+          ${[...D.ambassadors].sort((a,b)=>b.commission-a.commission).slice(0,5).map((a,i)=>`
+            <tr style="cursor:pointer;" onclick="showBADetail(${a.id})">
+              <td style="font-weight:700;color:${i<3?'var(--amber)':'var(--text-tertiary)'};">${i<3?['🥇','🥈','🥉'][i]:(i+1)}</td>
+              <td><span class="table-avatar" style="background:${avatarColor(a.name)}">${initials(a.name)}</span><span class="table-name">${a.name}</span></td>
+              <td class="table-mono">${a.recruits}</td>
+              <td class="table-mono">${fmt(a.commission)}</td>
+              <td>${trendArrow(a.trend)}</td>
+            </tr>
+          `).join('')}
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="card anim-up anim-d5">
+      <div class="card-header">
+        <div class="card-title">🚨 Alertes prioritaires</div>
+        <button class="card-action" onclick="goPage('alerts',document.querySelectorAll('.sidebar-item')[4])">Tout voir →</button>
+      </div>
+      <div class="card-body">
+        ${D.alerts.slice(0,3).map(a=>`
+          <div class="alert-card">
+            <div class="alert-icon" style="background:${a.bg};">${a.icon}</div>
+            <div class="alert-info"><div class="alert-title">${a.title}</div><div class="alert-desc">${a.desc}</div></div>
+            <button class="alert-action" onclick="toast('Action: ${a.action}','info')">${a.action}</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+// ========== AMBASSADORS ==========
+function renderAmbassadors(){
+  const sorted=[...D.ambassadors].sort((a,b)=>b.commission-a.commission);
+  document.getElementById('pageContent').innerHTML=`
+  <div class="card anim-up">
+    <div class="card-header">
+      <div class="card-title">👥 Tous les Brand Ambassadeurs (${totalBAs})</div>
+      <div style="display:flex;gap:8px;">
+        <button class="card-action" style="padding:5px 10px;background:var(--bg-elevated);border-radius:var(--radius-xs);" onclick="toast('Export CSV','info')">📥 Export</button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Ambassadeur</th><th>Ville / Zone</th><th>Recrues</th><th>Actifs</th><th>Activation</th><th>Commission</th><th>Objectif</th><th>Statut</th><th>Trend</th></tr></thead>
+        <tbody>
+        ${sorted.map((a,i)=>{
+          const actRate=pct(a.active,a.recruits);
+          const objRate=pct(a.recruits,a.target);
+          return`
+          <tr style="cursor:pointer;" onclick="showBADetail(${a.id})">
+            <td style="font-weight:700;color:var(--text-tertiary);">${i+1}</td>
+            <td><span class="table-avatar" style="background:${avatarColor(a.name)}">${initials(a.name)}</span><div style="display:inline-block;vertical-align:middle;"><div class="table-name">${a.name}</div><div class="table-sub">📞 ${a.phone}</div></div></td>
+            <td><div class="table-name" style="font-size:11px;">${a.city}</div><div class="table-sub">${a.zone}</div></td>
+            <td class="table-mono">${a.recruits}</td>
+            <td class="table-mono">${a.active}</td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div class="table-bar" style="width:60px;"><div class="table-bar-fill" style="width:${actRate}%;background:${actRate>=60?'var(--green)':actRate>=40?'var(--amber)':'var(--red)'};"></div></div><span style="font-size:10px;font-weight:700;font-family:var(--font-mono);color:${actRate>=60?'var(--green)':actRate>=40?'var(--amber)':'var(--red)'};">${actRate}%</span></div></td>
+            <td class="table-mono" style="color:var(--amber);">${fmt(a.commission)}</td>
+            <td><div style="display:flex;align-items:center;gap:8px;"><div class="table-bar" style="width:50px;"><div class="table-bar-fill" style="width:${Math.min(objRate,100)}%;background:${objRate>=80?'var(--green)':objRate>=50?'var(--amber)':'var(--red)'};"></div></div><span style="font-size:10px;font-family:var(--font-mono);">${a.recruits}/${a.target}</span></div></td>
+            <td>${statusBadge(a.status)}</td>
+            <td>${trendArrow(a.trend)}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+// ========== BA DETAIL MODAL ==========
+function showBADetail(id){
+  const a=D.ambassadors.find(x=>x.id===id);if(!a)return;
+  const actRate=pct(a.active,a.recruits);
+  const objRate=pct(a.recruits,a.target);
+  document.getElementById('baModalTitle').textContent=a.name;
+  document.getElementById('baModalBody').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div style="width:52px;height:52px;border-radius:16px;background:${avatarColor(a.name)};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:18px;color:#fff;">${initials(a.name)}</div>
+      <div><div style="font-size:16px;font-weight:700;">${a.name}</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">📞 ${a.phone} · 📍 ${a.city} (${a.zone}) · Depuis ${a.joined}</div><div style="margin-top:6px;">${statusBadge(a.status)} ${trendArrow(a.trend)}</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;">
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;font-family:var(--font-display);color:var(--text-primary);">${a.recruits}</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:2px;">Recrues</div></div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;font-family:var(--font-display);color:${actRate>=60?'var(--green)':'var(--amber)'};">${actRate}%</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:2px;">Activation</div></div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:12px;text-align:center;"><div style="font-size:22px;font-weight:800;font-family:var(--font-display);color:var(--amber);">${fmt(a.commission)}</div><div style="font-size:10px;color:var(--text-tertiary);margin-top:2px;">Commission XAF</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:12px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">🧳</span><div><div style="font-size:16px;font-weight:800;font-family:var(--font-display);">${a.passengers}</div><div style="font-size:10px;color:var(--text-tertiary);">Passagers</div></div></div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:12px;display:flex;align-items:center;gap:10px;"><span style="font-size:20px;">🔥</span><div><div style="font-size:16px;font-weight:800;font-family:var(--font-display);">${a.streak}</div><div style="font-size:10px;color:var(--text-tertiary);">Jours série</div></div></div>
+    </div>
+    <div style="margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;">Objectif mensuel</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="flex:1;height:8px;background:var(--bg-elevated);border-radius:8px;overflow:hidden;"><div style="height:100%;width:${Math.min(objRate,100)}%;background:${objRate>=80?'var(--green)':objRate>=50?'var(--amber)':'var(--red)'};border-radius:8px;transition:width 0.6s;"></div></div>
+        <span style="font-size:13px;font-weight:700;font-family:var(--font-mono);">${objRate}%</span>
+      </div>
+      <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">${a.recruits} sur ${a.target} recrues — ${Math.max(0,a.target-a.recruits)} restantes</div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="toast('Message envoyé à ${a.name}','success');closeModal('baModal');" style="flex:1;padding:10px;border-radius:var(--radius-sm);background:var(--red-dim);color:var(--red);border:none;font-size:12px;font-weight:700;cursor:pointer;">📱 Contacter</button>
+      <button onclick="toast('Rapport ${a.name} en cours...','info');" style="flex:1;padding:10px;border-radius:var(--radius-sm);background:var(--bg-elevated);color:var(--text-secondary);border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;">📊 Rapport</button>
+    </div>
+  `;
+  openModal('baModal');
+}
+
+// ========== PERFORMANCE ==========
+function renderPerformance(){
+  const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const maxE=Math.max(...D.weeklyEnrolments);
+  const maxA=Math.max(...D.weeklyActivations);
+  const maxMax=Math.max(maxE,maxA);
+  // Heatmap data (simulated)
+  const heatData=[];for(let i=0;i<28;i++)heatData.push(Math.floor(Math.random()*8));
+  const heatMax=Math.max(...heatData);
+
+  document.getElementById('pageContent').innerHTML=`
+  <div class="grid-2">
+    <div class="card anim-up anim-d1">
+      <div class="card-header"><div class="card-title">📊 Enrôlements vs Activations</div></div>
+      <div class="card-body">
+        <div class="bar-chart" style="height:160px;">
+          ${D.weeklyEnrolments.map((v,i)=>{const a=D.weeklyActivations[i];return`<div class="bar-col"><div class="bar-val">${v}</div><div class="bar" style="height:${(v/maxMax)*130}px;background:linear-gradient(180deg,var(--red),rgba(229,57,53,0.3));"></div><div class="bar" style="height:${(a/maxMax)*130}px;background:linear-gradient(180deg,var(--green),rgba(52,211,153,0.3));margin-top:-2px;border-radius:0 0 4px 4px;"></div><div class="bar-lbl">${days[i]}</div></div>`;}).join('')}
+        </div>
+        <div style="display:flex;gap:16px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);"><div style="width:10px;height:10px;border-radius:3px;background:var(--red);"></div>Enrôlements</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);"><div style="width:10px;height:10px;border-radius:3px;background:var(--green);"></div>Activations</div>
+        </div>
+      </div>
+    </div>
+    <div class="card anim-up anim-d2">
+      <div class="card-header"><div class="card-title">🔥 Heatmap d'activité (4 semaines)</div></div>
+      <div class="card-body">
+        <div class="heatmap">
+          ${days.map(d=>`<div class="heat-cell heat-header">${d.substring(0,2)}</div>`).join('')}
+          ${heatData.map(v=>{const intensity=heatMax>0?v/heatMax:0;const bg=intensity>0.7?'var(--red)':intensity>0.4?'rgba(229,57,53,0.5)':intensity>0.1?'rgba(229,57,53,0.2)':'var(--bg-elevated)';return`<div class="heat-cell" style="background:${bg};" title="${v} actions">${v}</div>`;}).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:10px;color:var(--text-tertiary);">
+          <span>Moins actif</span>
+          <div style="display:flex;gap:3px;">
+            <div style="width:12px;height:12px;border-radius:3px;background:var(--bg-elevated);"></div>
+            <div style="width:12px;height:12px;border-radius:3px;background:rgba(229,57,53,0.2);"></div>
+            <div style="width:12px;height:12px;border-radius:3px;background:rgba(229,57,53,0.5);"></div>
+            <div style="width:12px;height:12px;border-radius:3px;background:var(--red);"></div>
+          </div>
+          <span>Plus actif</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Revenue + Distribution -->
+  <div class="grid-2">
+    <div class="card anim-up anim-d3">
+      <div class="card-header"><div class="card-title">💰 Évolution revenus mensuels</div></div>
+      <div class="card-body">
+        <div class="bar-chart" style="height:140px;">
+          ${D.monthlyRevenue.map((v,i)=>{const maxR=Math.max(...D.monthlyRevenue);return`<div class="bar-col"><div class="bar-val">${fmt(v)}</div><div class="bar" style="height:${(v/maxR)*110}px;background:linear-gradient(180deg,var(--amber),rgba(251,191,36,0.2));"></div><div class="bar-lbl">${['Nov','Déc','Jan','Fév'][i]}</div></div>`;}).join('')}
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--green);font-weight:600;">↑ +${Math.round(((D.monthlyRevenue[3]-D.monthlyRevenue[2])/D.monthlyRevenue[2])*100)}% vs mois précédent</div>
+      </div>
+    </div>
+    <div class="card anim-up anim-d4">
+      <div class="card-header"><div class="card-title">📊 Distribution statuts BA</div></div>
+      <div class="card-body">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${[
+            {label:'Top performers',count:D.ambassadors.filter(a=>a.status==='top').length,color:'var(--green)',pct:pct(D.ambassadors.filter(a=>a.status==='top').length,totalBAs)},
+            {label:'Bons',count:D.ambassadors.filter(a=>a.status==='good').length,color:'var(--blue)',pct:pct(D.ambassadors.filter(a=>a.status==='good').length,totalBAs)},
+            {label:'À suivre',count:D.ambassadors.filter(a=>a.status==='watch').length,color:'var(--amber)',pct:pct(D.ambassadors.filter(a=>a.status==='watch').length,totalBAs)},
+            {label:'À risque',count:D.ambassadors.filter(a=>a.status==='risk').length,color:'var(--red)',pct:pct(D.ambassadors.filter(a=>a.status==='risk').length,totalBAs)},
+            {label:'Nouveaux',count:D.ambassadors.filter(a=>a.status==='new').length,color:'var(--purple)',pct:pct(D.ambassadors.filter(a=>a.status==='new').length,totalBAs)},
+          ].map(s=>`
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:8px;height:8px;border-radius:3px;background:${s.color};flex-shrink:0;"></div>
+              <div style="flex:1;font-size:12px;color:var(--text-secondary);">${s.label}</div>
+              <div style="flex:2;height:6px;background:var(--bg-elevated);border-radius:6px;overflow:hidden;"><div style="height:100%;width:${s.pct}%;background:${s.color};border-radius:6px;"></div></div>
+              <div style="font-size:12px;font-weight:700;font-family:var(--font-mono);min-width:30px;text-align:right;">${s.count}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BA Comparison -->
+  <div class="card anim-up anim-d5">
+    <div class="card-header"><div class="card-title">⚖️ Comparatif performances</div></div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Ambassadeur</th><th>Recrues</th><th>Actifs</th><th>Pass.</th><th>Comm.</th><th>Série</th><th>Obj. %</th><th>Score</th></tr></thead>
+        <tbody>
+        ${[...D.ambassadors].sort((a,b)=>{const sA=(a.commission/1000)+(pct(a.active,a.recruits)*0.5)+a.streak*2;const sB=(b.commission/1000)+(pct(b.active,b.recruits)*0.5)+b.streak*2;return sB-sA;}).map(a=>{
+          const score=Math.round((a.commission/1000)+(pct(a.active,a.recruits)*0.5)+a.streak*2);
+          return`<tr style="cursor:pointer;" onclick="showBADetail(${a.id})"><td><span class="table-avatar" style="background:${avatarColor(a.name)}">${initials(a.name)}</span><span class="table-name">${a.name}</span></td><td class="table-mono">${a.recruits}</td><td class="table-mono">${a.active}</td><td class="table-mono">${a.passengers}</td><td class="table-mono" style="color:var(--amber);">${fmt(a.commission)}</td><td>${a.streak>0?'🔥 '+a.streak:'-'}</td><td><span style="font-family:var(--font-mono);font-weight:700;font-size:11px;color:${pct(a.recruits,a.target)>=80?'var(--green)':pct(a.recruits,a.target)>=50?'var(--amber)':'var(--red)'};">${pct(a.recruits,a.target)}%</span></td><td><span style="font-family:var(--font-mono);font-weight:800;font-size:14px;color:var(--text-primary);">${score}</span></td></tr>`;
+        }).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+// ========== TERRITORIES ==========
+function renderTerritories(){
+  document.getElementById('pageContent').innerHTML=`
+  <div class="grid-2">
+    <div class="card anim-up anim-d1">
+      <div class="card-header"><div class="card-title">📍 Performance par territoire</div></div>
+      <div class="card-body" style="padding:0;">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Ville</th><th>BAs</th><th>Recrues</th><th>Actifs</th><th>Commission</th><th>Croiss.</th></tr></thead>
+          <tbody>
+          ${D.territories.map(t=>`
+            <tr>
+              <td><div class="table-name">${t.name}</div></td>
+              <td class="table-mono">${t.bas}</td>
+              <td class="table-mono">${t.recruits}</td>
+              <td class="table-mono">${t.active}</td>
+              <td class="table-mono" style="color:var(--amber);">${fmt(t.commission)}</td>
+              <td>${trendArrow(t.growth)}</td>
+            </tr>
+          `).join('')}
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <div class="card anim-up anim-d2">
+      <div class="card-header"><div class="card-title">🗺️ Répartition zones</div></div>
+      <div class="card-body">
+        <div class="zone-grid">
+          ${D.territories.map(t=>`
+            <div class="zone-card">
+              <div class="zone-name">📍 ${t.name}</div>
+              <div class="zone-stats">
+                <div class="zone-stat">BA: <strong>${t.bas}</strong></div>
+                <div class="zone-stat">Recr: <strong>${t.recruits}</strong></div>
+              </div>
+              <div style="margin-top:8px;height:4px;background:var(--border);border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${pct(t.commission,totalCommission)}%;background:var(--red);border-radius:4px;"></div>
+              </div>
+              <div style="font-size:9px;color:var(--text-tertiary);margin-top:4px;">${pct(t.commission,totalCommission)}% du CA total</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card anim-up anim-d3">
+    <div class="card-header"><div class="card-title">👥 Ambassadeurs par territoire</div></div>
+    <div class="card-body">
+      ${D.territories.map(t=>`
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:13px;font-weight:700;">${t.name}</div>
+            <div style="font-size:11px;color:var(--text-tertiary);">${t.bas} BA · ${fmt(t.commission)} XAF</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${D.ambassadors.filter(a=>a.city===t.name).map(a=>`
+              <div onclick="showBADetail(${a.id})" style="display:flex;align-items:center;gap:8px;background:var(--bg-elevated);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-elevated)'">
+                <div style="width:28px;height:28px;border-radius:8px;background:${avatarColor(a.name)};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#fff;">${initials(a.name)}</div>
+                <div><div style="font-size:11px;font-weight:600;">${a.name}</div><div style="font-size:9px;color:var(--text-tertiary);">${a.recruits} rec. · ${statusBadge(a.status)}</div></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+// ========== ALERTS ==========
+function renderAlerts(){
+  document.getElementById('pageContent').innerHTML=`
+  <div class="grid-2">
+    <div class="card anim-up anim-d1">
+      <div class="card-header"><div class="card-title">🚨 Alertes actives (${D.alerts.length})</div></div>
+      <div class="card-body">
+        ${D.alerts.map(a=>`
+          <div class="alert-card">
+            <div class="alert-icon" style="background:${a.bg};">${a.icon}</div>
+            <div class="alert-info"><div class="alert-title">${a.title}</div><div class="alert-desc">${a.desc}</div></div>
+            <button class="alert-action" onclick="toast('Action: ${a.action}','success')">${a.action}</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card anim-up anim-d2">
+      <div class="card-header"><div class="card-title">⚡ Fil d'activité complet</div></div>
+      <div class="card-body" style="max-height:400px;overflow-y:auto;">
+        ${D.activity.map(a=>`<div class="feed-item"><div class="feed-dot" style="background:${a.color};"></div><div><div class="feed-text">${a.text}</div><div class="feed-time">${a.time}</div></div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="card anim-up anim-d3">
+    <div class="card-header"><div class="card-title">📉 BA sous-performants</div></div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Ambassadeur</th><th>Activation</th><th>Objectif</th><th>Tendance</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody>
+        ${D.ambassadors.filter(a=>a.status==='risk'||a.status==='watch').map(a=>{
+          const actRate=pct(a.active,a.recruits);
+          return`<tr>
+            <td><span class="table-avatar" style="background:${avatarColor(a.name)}">${initials(a.name)}</span><span class="table-name">${a.name}</span></td>
+            <td><span style="color:${actRate>=50?'var(--amber)':'var(--red)'};font-weight:700;font-family:var(--font-mono);">${actRate}%</span></td>
+            <td><span style="font-family:var(--font-mono);">${a.recruits}/${a.target}</span></td>
+            <td>${trendArrow(a.trend)}</td>
+            <td>${statusBadge(a.status)}</td>
+            <td><button style="background:var(--red-dim);color:var(--red);border:none;padding:5px 10px;border-radius:var(--radius-xs);font-size:10px;font-weight:700;cursor:pointer;" onclick="toast('Relance envoyée à ${a.name}','success')">📱 Relancer</button></td>
+          </tr>`;}).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+// ========== DRIVERS ==========
+let drvFilter='tous';
+function renderDrivers(){
+  const el=document.getElementById('pageContent');
+  const actif=drvActive().length,inactif=drvInactive().length,pending=drvPending().length;
+  const total=D.drivers.length;
+  const filtered=drvFilter==='tous'?D.drivers:D.drivers.filter(d=>d.status===(drvFilter==='actifs'?'actif':drvFilter==='inactifs'?'inactif':'en_attente'));
+
+  el.innerHTML=`
+  <!-- KPIs Chauffeurs -->
+  <div class="kpi-row">
+    <div class="kpi anim-up anim-d1">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--blue-dim);">🚕</div>${trendArrow(12)}</div>
+      <div class="kpi-value">${total}</div>
+      <div class="kpi-label">Total chauffeurs</div>
+      <div style="margin-top:8px;"><div class="perf-mini-bars"><div class="perf-mini-bar" style="width:${pct(actif,total)}%;background:var(--green);"></div><div class="perf-mini-bar" style="width:${pct(pending,total)}%;background:var(--amber);"></div><div class="perf-mini-bar" style="width:${pct(inactif,total)}%;background:var(--red);"></div></div>
+      <div style="display:flex;gap:8px;margin-top:4px;font-size:9px;"><span style="color:var(--green);">● ${actif} actifs</span><span style="color:var(--amber);">● ${pending} attente</span><span style="color:var(--red);">● ${inactif} inactifs</span></div></div>
+    </div>
+    <div class="kpi anim-up anim-d2">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--green-dim);">📊</div></div>
+      <div class="kpi-value">${fmt(drvTotalTrips())}</div>
+      <div class="kpi-label">Courses totales</div>
+      <div class="kpi-sparkline">${sparkSVG([280,310,340,380,420,450,drvTotalTrips()/6],'var(--green)')}</div>
+    </div>
+    <div class="kpi anim-up anim-d3">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--amber-dim);">💰</div></div>
+      <div class="kpi-value">${fmt(drvTotalRev())}</div>
+      <div class="kpi-label">Revenus générés (XAF)</div>
+      <div class="kpi-sparkline">${sparkSVG([180000,195000,210000,drvTotalRev()],'var(--amber)')}</div>
+    </div>
+    <div class="kpi anim-up anim-d4">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--purple-dim);">⭐</div></div>
+      <div class="kpi-value">${drvAvgRating()}</div>
+      <div class="kpi-label">Note moyenne</div>
+      <div style="margin-top:6px;">${ratingStars(drvAvgRating())}</div>
+    </div>
+  </div>
+
+  <!-- Filters + Table -->
+  <div class="card anim-up anim-d3">
+    <div class="card-tabs" id="drvTabs">
+      ${['tous','actifs','en_attente','inactifs'].map(f=>`<button class="card-tab ${drvFilter===f?'active':''}" onclick="drvFilter='${f}';renderDrivers();">${f==='tous'?'Tous ('+total+')':f==='actifs'?'Actifs ('+actif+')':f==='en_attente'?'En attente ('+pending+')':'Inactifs ('+inactif+')'}</button>`).join('')}
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Chauffeur</th><th>Plaque</th><th>BA référent</th><th>Courses</th><th>Revenus</th><th>Note</th><th>Ponctualité</th><th>Annul.</th><th>Statut</th></tr></thead>
+        <tbody>
+        ${filtered.sort((a,b)=>b.trips-a.trips).map(d=>`
+          <tr style="cursor:pointer;" onclick="showDriverDetail(${d.id})">
+            <td><span class="table-avatar" style="background:${avatarColor(d.name)}">${initials(d.name)}</span><div style="display:inline-block;vertical-align:middle;"><div class="table-name">${d.name}</div><div class="table-sub">${d.city} · ${d.vehicle}</div></div></td>
+            <td><span style="font-family:var(--font-mono);font-size:11px;background:var(--bg-elevated);padding:3px 6px;border-radius:4px;">${d.plate}</span></td>
+            <td><span style="font-size:11px;">${d.ba}</span></td>
+            <td class="table-mono">${d.trips}</td>
+            <td class="table-mono" style="color:var(--amber);">${fmt(d.revenue)}</td>
+            <td>${ratingStars(d.rating)}</td>
+            <td><div style="display:flex;align-items:center;gap:6px;"><div class="table-bar" style="width:50px;"><div class="table-bar-fill" style="width:${d.onTimeRate}%;background:${perfColor(d.onTimeRate,[85,70])};"></div></div><span style="font-size:10px;font-weight:700;font-family:var(--font-mono);color:${perfColor(d.onTimeRate,[85,70])};">${d.onTimeRate}%</span></div></td>
+            <td><span style="font-family:var(--font-mono);font-size:11px;color:${perfColor(100-d.cancelRate,[90,80])};">${d.cancelRate}%</span></td>
+            <td>${driverStatusBadge(d.status)}</td>
+          </tr>
+        `).join('')}
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- Performance grid -->
+  <div class="grid-2" style="margin-top:20px;">
+    <div class="card anim-up anim-d4">
+      <div class="card-header"><div class="card-title">🏆 Top 5 chauffeurs</div></div>
+      <div class="card-body">
+        ${[...D.drivers].filter(d=>d.status==='actif').sort((a,b)=>b.rating-a.rating).slice(0,5).map((d,i)=>`
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i<4?'border-bottom:1px solid rgba(42,49,72,0.4);':''};cursor:pointer;" onclick="showDriverDetail(${d.id})">
+            <span style="font-weight:800;font-family:var(--font-display);width:20px;color:${i<3?'var(--amber)':'var(--text-tertiary)'};">${i<3?['🥇','🥈','🥉'][i]:(i+1)}</span>
+            <div style="width:30px;height:30px;border-radius:8px;background:${avatarColor(d.name)};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#fff;">${initials(d.name)}</div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;">${d.name}</div><div style="font-size:10px;color:var(--text-tertiary);">${d.trips} courses · ${d.city}</div></div>
+            ${gaugeSVG(d.rating,5,perfColor(d.rating,[4.5,3.5]),42)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="card anim-up anim-d5">
+      <div class="card-header"><div class="card-title">⚠️ Chauffeurs à risque</div></div>
+      <div class="card-body">
+        ${D.drivers.filter(d=>d.cancelRate>10||d.rating<3.5||d.complaints>=2).map(d=>`
+          <div class="alert-card" onclick="showDriverDetail(${d.id})">
+            <div class="alert-icon" style="background:var(--red-dim);">⚠️</div>
+            <div class="alert-info">
+              <div class="alert-title">${d.name}</div>
+              <div class="alert-desc">${d.cancelRate>10?'Annulations: '+d.cancelRate+'% ':'' }${d.rating&&d.rating<3.5?'Note: '+d.rating+' ':'' }${d.complaints>=2?d.complaints+' plaintes ':'' }· ${d.city}</div>
+            </div>
+            <button class="alert-action" onclick="event.stopPropagation();toast('Alerte envoyée à ${d.ba}','success');">Alerter BA</button>
+          </div>
+        `).join('')||'<div style="text-align:center;padding:20px;color:var(--text-tertiary);font-size:12px;">Aucun chauffeur à risque 🎉</div>'}
+      </div>
+    </div>
+  </div>`;
+}
+
+// Driver detail modal
+function showDriverDetail(id){
+  const d=D.drivers.find(x=>x.id===id);if(!d)return;
+  const days=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const maxT=Math.max(...d.weeklyTrips,1);
+  document.getElementById('driverModalTitle').textContent=d.name;
+  document.getElementById('driverModalBody').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+      <div style="width:50px;height:50px;border-radius:14px;background:${avatarColor(d.name)};display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:17px;color:#fff;">${initials(d.name)}</div>
+      <div style="flex:1;"><div style="font-size:15px;font-weight:700;">${d.name}</div><div style="font-size:11px;color:var(--text-tertiary);margin-top:2px;">📞 ${d.phone} · 🚗 ${d.plate} · ${d.vehicle}</div><div style="font-size:11px;color:var(--text-tertiary);">📍 ${d.city} · BA: <strong style="color:var(--text-secondary);">${d.ba}</strong></div><div style="margin-top:5px;">${driverStatusBadge(d.status)}</div></div>
+    </div>
+    <!-- Performance gauges -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+        ${gaugeSVG(d.rating||0,5,perfColor(d.rating||0,[4.5,3.5]),50)}
+        <div style="font-size:9px;color:var(--text-tertiary);margin-top:4px;">Note</div>
+      </div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+        ${gaugeSVG(d.onTimeRate||0,100,perfColor(d.onTimeRate||0,[85,70]),50)}
+        <div style="font-size:9px;color:var(--text-tertiary);margin-top:4px;">Ponctualité</div>
+      </div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+        ${gaugeSVG(Math.max(0,100-d.cancelRate),100,perfColor(100-d.cancelRate,[90,80]),50)}
+        <div style="font-size:9px;color:var(--text-tertiary);margin-top:4px;">Fiabilité</div>
+      </div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;">
+        <div class="gauge-ring"><div class="gauge-center"><div class="gauge-val" style="color:var(--amber);">${d.trips}</div></div></div>
+        <div style="font-size:9px;color:var(--text-tertiary);margin-top:4px;">Courses</div>
+      </div>
+    </div>
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:var(--font-display);color:var(--text-primary);">${d.passengers}</div><div style="font-size:9px;color:var(--text-tertiary);">Passagers</div></div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:var(--font-display);color:var(--amber);">${fmt(d.revenue)}</div><div style="font-size:9px;color:var(--text-tertiary);">Revenus XAF</div></div>
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;font-family:var(--font-display);color:${d.complaints>0?'var(--red)':'var(--green)'};">${d.complaints}</div><div style="font-size:9px;color:var(--text-tertiary);">Plaintes</div></div>
+    </div>
+    <!-- Weekly activity -->
+    <div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px;">Courses cette semaine</div>
+    <div class="bar-chart" style="height:80px;">
+      ${d.weeklyTrips.map((v,i)=>`<div class="bar-col"><div class="bar-val">${v}</div><div class="bar" style="height:${maxT>0?(v/maxT)*60:2}px;background:${v>0?'linear-gradient(180deg,var(--blue),rgba(96,165,250,0.3))':'var(--bg-elevated)'};"></div><div class="bar-lbl">${days[i]}</div></div>`).join('')}
+    </div>
+    <div style="display:flex;gap:6px;margin-top:14px;">
+      <button class="cfg-btn primary" style="flex:1;" onclick="toast('Message envoyé au chauffeur','success');closeModal('driverModal');">📱 Contacter</button>
+      <button class="cfg-btn secondary" style="flex:1;" onclick="toast('Alerte envoyée à ${d.ba}','success');">📨 Alerter BA</button>
+      ${d.status==='en_attente'?`<button class="cfg-btn success" style="flex:1;" onclick="D.drivers.find(x=>x.id===${d.id}).status='actif';toast('${d.name} activé','success');closeModal('driverModal');renderDrivers();">✓ Activer</button>`:''}
+      ${d.status==='actif'?`<button class="cfg-btn secondary" style="flex:1;color:var(--red);" onclick="D.drivers.find(x=>x.id===${d.id}).status='inactif';toast('${d.name} suspendu','error');closeModal('driverModal');renderDrivers();">⏸ Suspendre</button>`:''}
+    </div>
+  `;
+  openModal('driverModal');
+}
+
+// ========== TARGETS (Full Configuration) ==========
+let targetTab='suivi';
+// ─── Save Config via API ───
+function saveConfig(section) {
+  const payload = {};
+  if (section === 'ba') {
+    payload.baGlobal = D.objConfig.baGlobal;
+  } else if (section === 'driver') {
+    payload.driverGlobal = D.objConfig.driverGlobal;
+  } else if (section === 'tiers') {
+    payload.tiers = D.objConfig.tiers;
+  }
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+  fetch('/manager/api/config/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+    body: JSON.stringify(payload),
+  }).then(r => r.json()).then(data => {
+    if (data.ok) toast('Configuration enregistrée ✅', 'success');
+    else toast('Erreur: ' + (data.error || 'inconnue'), 'error');
+  }).catch(() => toast('Erreur réseau', 'error'));
+}
+
+function renderTargets(){
+  const el=document.getElementById('pageContent');
+  const cfg=D.objConfig;
+  const globalTarget=D.ambassadors.reduce((s,a)=>s+a.target,0);
+  const globalAchieved=totalRecruits;
+  const globalPct=pct(globalAchieved,globalTarget);
+  const drvTarget=cfg.driverGlobal.minTripsWeek*drvActive().length;
+  const drvAchieved=D.drivers.filter(d=>d.status==='actif').reduce((s,d)=>{const wk=d.weeklyTrips.reduce((a,b)=>a+b,0);return s+wk;},0);
+  const drvPctAchieved=pct(drvAchieved,drvTarget);
+
+  el.innerHTML=`
+  <!-- KPIs -->
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+    <div class="kpi anim-up anim-d1">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--red-dim);">🎯</div></div>
+      <div class="kpi-value">${globalPct}%</div>
+      <div class="kpi-label">Obj. recrues BA</div>
+      <div style="margin-top:8px;height:5px;background:var(--bg-elevated);border-radius:5px;overflow:hidden;"><div style="height:100%;width:${globalPct}%;background:${globalPct>=70?'var(--green)':globalPct>=40?'var(--amber)':'var(--red)'};border-radius:5px;"></div></div>
+      <div style="font-size:9px;color:var(--text-tertiary);margin-top:3px;">${globalAchieved}/${globalTarget}</div>
+    </div>
+    <div class="kpi anim-up anim-d2">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--blue-dim);">🚕</div></div>
+      <div class="kpi-value">${drvPctAchieved}%</div>
+      <div class="kpi-label">Obj. courses chauffeurs</div>
+      <div style="margin-top:8px;height:5px;background:var(--bg-elevated);border-radius:5px;overflow:hidden;"><div style="height:100%;width:${Math.min(drvPctAchieved,100)}%;background:${drvPctAchieved>=70?'var(--green)':drvPctAchieved>=40?'var(--amber)':'var(--red)'};border-radius:5px;"></div></div>
+    </div>
+    <div class="kpi anim-up anim-d3">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--green-dim);">✅</div></div>
+      <div class="kpi-value" style="color:var(--green);">${D.ambassadors.filter(a=>pct(a.recruits,a.target)>=80).length}</div>
+      <div class="kpi-label">BA en bonne voie</div>
+    </div>
+    <div class="kpi anim-up anim-d4">
+      <div class="kpi-header"><div class="kpi-icon" style="background:var(--red-dim);">❌</div></div>
+      <div class="kpi-value" style="color:var(--red);">${D.ambassadors.filter(a=>pct(a.recruits,a.target)<40).length}</div>
+      <div class="kpi-label">BA en retard</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="card anim-up anim-d3" style="margin-bottom:20px;">
+    <div class="card-tabs">
+      <button class="card-tab ${targetTab==='suivi'?'active':''}" onclick="targetTab='suivi';renderTargets();">📊 Suivi avancement</button>
+      <button class="card-tab ${targetTab==='config_ba'?'active':''}" onclick="targetTab='config_ba';renderTargets();">⚙️ Config. objectifs BA</button>
+      <button class="card-tab ${targetTab==='config_drv'?'active':''}" onclick="targetTab='config_drv';renderTargets();">🚕 Config. objectifs Chauffeurs</button>
+      <button class="card-tab ${targetTab==='tiers'?'active':''}" onclick="targetTab='tiers';renderTargets();">🏅 Paliers & Bonus</button>
+    </div>
+    <div class="card-body" id="targetTabContent"></div>
+  </div>`;
+
+  const tc=document.getElementById('targetTabContent');
+  if(targetTab==='suivi') renderTargetSuivi(tc);
+  else if(targetTab==='config_ba') renderConfigBA(tc);
+  else if(targetTab==='config_drv') renderConfigDriver(tc);
+  else if(targetTab==='tiers') renderConfigTiers(tc);
+}
+
+function renderTargetSuivi(tc){
+  tc.innerHTML=`
+  <div class="cfg-section">
+    <div class="cfg-section-title">🎯 Objectifs individuels BA — Recrues</div>
+    ${[...D.ambassadors].sort((a,b)=>pct(b.recruits,b.target)-pct(a.recruits,a.target)).map(a=>{
+      const p=pct(a.recruits,a.target);
+      const remaining=Math.max(0,a.target-a.recruits);
+      return`<div class="target-row" style="cursor:pointer;" onclick="showBADetail(${a.id})">
+        <div style="display:flex;align-items:center;gap:8px;min-width:150px;"><div style="width:26px;height:26px;border-radius:7px;background:${avatarColor(a.name)};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px;color:#fff;">${initials(a.name)}</div><div><div style="font-size:12px;font-weight:600;">${a.name}</div><div style="font-size:9px;color:var(--text-tertiary);">${a.city} · ${statusBadge(a.status)}</div></div></div>
+        <div class="target-bar"><div class="target-bar-fill" style="width:${Math.min(p,100)}%;background:${p>=80?'var(--green)':p>=50?'var(--amber)':'var(--red)'};"></div></div>
+        <div class="target-val" style="color:${p>=80?'var(--green)':p>=50?'var(--amber)':'var(--red)'};">${p}%</div>
+        <div style="font-size:10px;color:var(--text-tertiary);min-width:60px;">${a.recruits}/${a.target}</div>
+        <div style="font-size:9px;color:var(--text-tertiary);min-width:60px;">${remaining>0?remaining+' restant'+(remaining>1?'s':''):'✅ Atteint'}</div>
+      </div>`;}).join('')}
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">🚕 Performance chauffeurs vs seuils</div>
+    ${[...D.drivers].filter(d=>d.status==='actif').sort((a,b)=>b.rating-a.rating).slice(0,8).map(d=>{
+      const wk=d.weeklyTrips.reduce((a,b)=>a+b,0);
+      const cfg=D.objConfig.driverGlobal;
+      const tripOk=wk>=cfg.minTripsWeek;const rateOk=d.rating>=cfg.minRating;const cancelOk=d.cancelRate<=cfg.maxCancelRate;const timeOk=d.onTimeRate>=cfg.minOnTimeRate;
+      const score=[tripOk,rateOk,cancelOk,timeOk].filter(Boolean).length;
+      return`<div class="cfg-row" style="cursor:pointer;" onclick="showDriverDetail(${d.id})">
+        <div style="display:flex;align-items:center;gap:8px;min-width:130px;"><div style="width:24px;height:24px;border-radius:6px;background:${avatarColor(d.name)};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px;color:#fff;">${initials(d.name)}</div><div style="font-size:11px;font-weight:600;">${d.name}</div></div>
+        <div style="display:flex;gap:6px;flex:1;justify-content:flex-end;">
+          <span class="badge ${tripOk?'green':'red'}" style="font-size:9px;">${wk}/${cfg.minTripsWeek} courses</span>
+          <span class="badge ${rateOk?'green':'red'}" style="font-size:9px;">★ ${d.rating}</span>
+          <span class="badge ${cancelOk?'green':'red'}" style="font-size:9px;">↩ ${d.cancelRate}%</span>
+          <span class="badge ${timeOk?'green':'amber'}" style="font-size:9px;">⏰ ${d.onTimeRate}%</span>
+        </div>
+        <div style="font-size:12px;font-weight:800;font-family:var(--font-display);color:${score===4?'var(--green)':score>=3?'var(--amber)':'var(--red)'};">${score}/4</div>
+      </div>`;}).join('')}
+  </div>`;
+}
+
+function renderConfigBA(tc){
+  const c=D.objConfig.baGlobal;
+  tc.innerHTML=`
+  <div class="cfg-section">
+    <div class="cfg-section-title">📋 Objectifs globaux Brand Ambassadeurs</div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Recrues cibles / mois</strong><div class="cfg-hint">Nombre minimum de chauffeurs à recruter mensuellement</div></div><input class="cfg-input" type="number" value="${c.recruitsTarget}" min="1" max="50" onchange="D.objConfig.baGlobal.recruitsTarget=+this.value;toast('Objectif recrues: '+this.value,'success');"></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Taux d'activation minimum</strong><div class="cfg-hint">% de recrues devant être actifs</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.activationTarget}" min="0" max="100" onchange="D.objConfig.baGlobal.activationTarget=+this.value;toast('Seuil activation: '+this.value+'%','success');"><span style="font-size:12px;color:var(--text-tertiary);">%</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Passagers min / recrue</strong><div class="cfg-hint">Seuil pour qu'une recrue soit considérée performante</div></div><input class="cfg-input" type="number" value="${c.minPassengers}" min="1" max="100" onchange="D.objConfig.baGlobal.minPassengers=+this.value;toast('Min passagers: '+this.value,'success');"></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Période d'évaluation</strong></div><select class="cfg-select" onchange="D.objConfig.baGlobal.period=this.value;toast('Période: '+this.value,'success');"><option value="hebdomadaire" ${c.period==='hebdomadaire'?'selected':''}>Hebdomadaire</option><option value="mensuel" ${c.period==='mensuel'?'selected':''}>Mensuel</option><option value="trimestriel" ${c.period==='trimestriel'?'selected':''}>Trimestriel</option></select></div>
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">💰 Commissions & Bonus BA</div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Commission par recrue activée</strong></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.commissionPerRecruit}" step="500" min="0" onchange="D.objConfig.baGlobal.commissionPerRecruit=+this.value;toast('Commission: '+this.value+' XAF','success');"><span style="font-size:11px;color:var(--text-tertiary);">XAF</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Bonus série 3 jours</strong><div class="cfg-hint">Bonus pour 3 jours consécutifs de recrutement</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.bonusStreak3}" step="500" min="0" onchange="D.objConfig.baGlobal.bonusStreak3=+this.value;toast('Bonus 3j: '+this.value+' XAF','success');"><span style="font-size:11px;color:var(--text-tertiary);">XAF</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Bonus série 7 jours</strong></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.bonusStreak7}" step="500" min="0" onchange="D.objConfig.baGlobal.bonusStreak7=+this.value;toast('Bonus 7j: '+this.value+' XAF','success');"><span style="font-size:11px;color:var(--text-tertiary);">XAF</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Bonus Top performer du mois</strong></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.bonusTop}" step="1000" min="0" onchange="D.objConfig.baGlobal.bonusTop=+this.value;toast('Bonus Top: '+this.value+' XAF','success');"><span style="font-size:11px;color:var(--text-tertiary);">XAF</span></div></div>
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">🎯 Objectifs individuels par BA</div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px;">Ajustez les cibles de recrutement pour chaque ambassadeur. Les modifications s'appliquent immédiatement.</div>
+    ${D.ambassadors.map(a=>`
+      <div class="cfg-row">
+        <div style="display:flex;align-items:center;gap:8px;min-width:140px;"><div style="width:24px;height:24px;border-radius:6px;background:${avatarColor(a.name)};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:9px;color:#fff;">${initials(a.name)}</div><div><div style="font-size:11px;font-weight:600;">${a.name}</div><div style="font-size:9px;color:var(--text-tertiary);">${a.city}</div></div></div>
+        <div style="flex:1;display:flex;align-items:center;gap:6px;justify-content:flex-end;">
+          <span style="font-size:10px;color:var(--text-tertiary);">Cible:</span>
+          <input class="cfg-input" type="number" value="${a.target}" min="1" max="50" style="width:56px;" onchange="D.ambassadors.find(x=>x.id===${a.id}).target=+this.value;toast('${a.name.split(' ')[0]}: '+this.value+' recrues','success');">
+          <span style="font-size:10px;color:var(--text-tertiary);">Actuel: <strong style="color:${pct(a.recruits,a.target)>=80?'var(--green)':'var(--text-primary)'};">${a.recruits}</strong></span>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+  <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);">
+    <button class="cfg-btn primary" onclick="saveConfig('ba')">💾 Enregistrer</button>
+    <button class="cfg-btn secondary" onclick="toast('Changements réinitialisés','info')">↩ Réinitialiser</button>
+    <button class="cfg-btn secondary" onclick="toast('Export de la configuration...','info')">📥 Exporter</button>
+  </div>`;
+}
+
+function renderConfigDriver(tc){
+  const c=D.objConfig.driverGlobal;
+  tc.innerHTML=`
+  <div class="cfg-section">
+    <div class="cfg-section-title">📋 Seuils de performance chauffeurs</div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:12px;">Définissez les critères qui déterminent si un chauffeur est performant. Ces seuils sont utilisés pour le scoring automatique et les alertes.</div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Courses minimum / semaine</strong><div class="cfg-hint">En dessous de ce seuil, le chauffeur est signalé comme sous-performant</div></div><input class="cfg-input" type="number" value="${c.minTripsWeek}" min="1" max="100" onchange="D.objConfig.driverGlobal.minTripsWeek=+this.value;toast('Min courses/sem: '+this.value,'success');"></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Note minimum requise</strong><div class="cfg-hint">Seuil de satisfaction client (sur 5.0)</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.minRating}" min="1" max="5" step="0.1" onchange="D.objConfig.driverGlobal.minRating=+this.value;toast('Note min: '+this.value,'success');"><span style="font-size:11px;color:var(--text-tertiary);">/ 5.0</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Taux d'annulation maximum</strong><div class="cfg-hint">% d'annulations toléré avant alerte</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.maxCancelRate}" min="0" max="100" onchange="D.objConfig.driverGlobal.maxCancelRate=+this.value;toast('Max annulations: '+this.value+'%','success');"><span style="font-size:11px;color:var(--text-tertiary);">%</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Ponctualité minimum</strong><div class="cfg-hint">% de courses à l'heure requis</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.minOnTimeRate}" min="0" max="100" onchange="D.objConfig.driverGlobal.minOnTimeRate=+this.value;toast('Ponctualité min: '+this.value+'%','success');"><span style="font-size:11px;color:var(--text-tertiary);">%</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Passagers minimum / semaine</strong></div><input class="cfg-input" type="number" value="${c.minPassengersWeek}" min="1" max="100" onchange="D.objConfig.driverGlobal.minPassengersWeek=+this.value;toast('Min passagers/sem: '+this.value,'success');"></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Période d'évaluation</strong></div><select class="cfg-select" onchange="D.objConfig.driverGlobal.period=this.value;toast('Période chauffeurs: '+this.value,'success');"><option value="hebdomadaire" ${c.period==='hebdomadaire'?'selected':''}>Hebdomadaire</option><option value="mensuel" ${c.period==='mensuel'?'selected':''}>Mensuel</option></select></div>
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">💰 Bonus chauffeurs</div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Bonus chauffeur actif / mois</strong><div class="cfg-hint">Prime versée aux chauffeurs atteignant tous les seuils</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="${c.bonusActive}" step="500" min="0" onchange="D.objConfig.driverGlobal.bonusActive=+this.value;toast('Bonus actif: '+this.value+' XAF','success');"><span style="font-size:11px;color:var(--text-tertiary);">XAF</span></div></div>
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">🔔 Règles d'alertes automatiques</div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Alerte inactivité après</strong><div class="cfg-hint">Nombre de jours sans course avant notification au BA</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="7" min="1" max="30"><span style="font-size:11px;color:var(--text-tertiary);">jours</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Alerte baisse de note</strong><div class="cfg-hint">Notifier si la note descend de plus de X points</div></div><div style="display:flex;align-items:center;gap:6px;"><input class="cfg-input" type="number" value="0.5" min="0.1" max="2" step="0.1"><span style="font-size:11px;color:var(--text-tertiary);">pts</span></div></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Suspension auto si plaintes ≥</strong><div class="cfg-hint">Suspension automatique du chauffeur après N plaintes</div></div><input class="cfg-input" type="number" value="3" min="1" max="10"></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Notifier le manager par email</strong></div><button class="cfg-toggle on" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'Notifs email activées':'Notifs email désactivées','info');"></button></div>
+    <div class="cfg-row"><div class="cfg-label"><strong>Notifier le BA par WhatsApp</strong></div><button class="cfg-toggle on" onclick="this.classList.toggle('on');toast(this.classList.contains('on')?'Notifs WhatsApp activées':'Notifs WhatsApp désactivées','info');"></button></div>
+  </div>
+  <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);">
+    <button class="cfg-btn primary" onclick="saveConfig('driver')">💾 Enregistrer</button>
+    <button class="cfg-btn secondary" onclick="toast('Changements réinitialisés','info')">↩ Réinitialiser</button>
+  </div>`;
+}
+
+function renderConfigTiers(tc){
+  const tiers=D.objConfig.tiers;
+  tc.innerHTML=`
+  <div class="cfg-section">
+    <div class="cfg-section-title">🏅 Paliers de progression BA</div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:16px;">Chaque palier définit un niveau de commission et des avantages. Les BA montent automatiquement en palier selon leurs performances.</div>
+    <div style="display:grid;grid-template-columns:repeat(${tiers.length},1fr);gap:10px;margin-bottom:20px;">
+      ${tiers.map((t,i)=>{
+        const basInTier=D.ambassadors.filter(a=>a.recruits>=t.minRecruits&&a.recruits<=t.maxRecruits).length;
+        return`<div style="background:var(--bg-elevated);border-radius:var(--radius);padding:16px;text-align:center;border:1px solid ${t.color}33;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${t.color};"></div>
+          <div style="font-size:28px;margin-bottom:4px;">${['🥉','🥈','🥇','💎'][i]}</div>
+          <div style="font-size:14px;font-weight:800;font-family:var(--font-display);color:${t.color};">${t.name}</div>
+          <div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;">${t.minRecruits}${t.maxRecruits<999?' — '+t.maxRecruits:'+'} recrues</div>
+          <div style="font-size:18px;font-weight:800;font-family:var(--font-display);color:var(--amber);margin-top:8px;">${fmt(t.commission)}</div>
+          <div style="font-size:9px;color:var(--text-tertiary);">XAF / recrue</div>
+          <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text-secondary);">${basInTier} BA</div>
+        </div>`;}).join('')}
+    </div>
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">⚙️ Modifier les paliers</div>
+    ${tiers.map((t,i)=>`
+      <div style="background:var(--bg-elevated);border-radius:var(--radius-sm);padding:14px;margin-bottom:8px;border-left:3px solid ${t.color};">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span style="font-size:18px;">${['🥉','🥈','🥇','💎'][i]}</span>
+          <span style="font-size:13px;font-weight:700;color:${t.color};">${t.name}</span>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <div><div style="font-size:9px;color:var(--text-tertiary);margin-bottom:3px;">Min recrues</div><input class="cfg-input" type="number" value="${t.minRecruits}" min="0" style="width:60px;" onchange="D.objConfig.tiers[${i}].minRecruits=+this.value;toast('${t.name} min: '+this.value,'success');"></div>
+          <div><div style="font-size:9px;color:var(--text-tertiary);margin-bottom:3px;">Max recrues</div><input class="cfg-input" type="number" value="${t.maxRecruits}" min="1" ${t.maxRecruits>=999?'':''}style="width:60px;" onchange="D.objConfig.tiers[${i}].maxRecruits=+this.value;toast('${t.name} max: '+this.value,'success');"></div>
+          <div><div style="font-size:9px;color:var(--text-tertiary);margin-bottom:3px;">Commission/recrue (XAF)</div><input class="cfg-input" type="number" value="${t.commission}" step="500" min="0" style="width:80px;" onchange="D.objConfig.tiers[${i}].commission=+this.value;toast('${t.name}: '+this.value+' XAF','success');"></div>
+        </div>
+      </div>
+    `).join('')}
+  </div>
+  <div class="cfg-section">
+    <div class="cfg-section-title">📊 Répartition actuelle des BA par palier</div>
+    ${tiers.map((t,i)=>{
+      const bas=D.ambassadors.filter(a=>a.recruits>=t.minRecruits&&a.recruits<=t.maxRecruits);
+      return`<div style="margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:14px;">${['🥉','🥈','🥇','💎'][i]}</span><span style="font-size:12px;font-weight:700;color:${t.color};">${t.name}</span></div>
+          <span style="font-size:11px;color:var(--text-tertiary);">${bas.length} BA · ${fmt(bas.reduce((s,a)=>s+a.commission,0))} XAF</span>
+        </div>
+        ${bas.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;">${bas.map(a=>`<div style="display:flex;align-items:center;gap:6px;background:var(--bg-card);padding:5px 10px;border-radius:var(--radius-xs);border:1px solid var(--border);cursor:pointer;" onclick="showBADetail(${a.id})"><div style="width:20px;height:20px;border-radius:5px;background:${avatarColor(a.name)};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:8px;color:#fff;">${initials(a.name)}</div><span style="font-size:10px;font-weight:600;">${a.name.split(' ')[0]}</span><span style="font-size:9px;color:var(--text-tertiary);">${a.recruits}r</span></div>`).join('')}</div>`:'<div style="font-size:11px;color:var(--text-tertiary);">Aucun BA dans ce palier</div>'}
+      </div>`;}).join('')}
+  </div>
+  <div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);">
+    <button class="cfg-btn primary" onclick="saveConfig('tiers');renderTargets();">💾 Enregistrer</button>
+    <button class="cfg-btn secondary" onclick="toast('Réinitialisé aux valeurs par défaut','info')">↩ Réinitialiser</button>
+  </div>`;
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',()=>{renderDashboard();});
+</script>
+</body>
+</html>
