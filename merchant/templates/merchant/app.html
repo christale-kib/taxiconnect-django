@@ -1,0 +1,908 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Merchant App - Airtel Money</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --red-dark: #b71c1c;
+        --red: #c62828;
+        --red-mid: #e53935;
+        --red-light: #ef5350;
+        --red-bg: #ffebee;
+        --green: #2e7d32;
+        --green-light: #43a047;
+        --green-bg: #e8f5e9;
+        --orange: #e65100;
+        --orange-light: #ff6f00;
+        --orange-bg: #fff3e0;
+        --yellow-bg: #fff8e1;
+        --blue: #1565c0;
+        --blue-light: #42a5f5;
+        --bg: #f5f5f7;
+        --card: #fff;
+        --text: #1a1a1a;
+        --text-secondary: #999;
+        --text-tertiary: #bbb;
+        --border: rgba(0, 0, 0, 0.04);
+        --shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+        --radius: 22px;
+        --radius-sm: 14px;
+        --font-display: "Outfit", sans-serif;
+        --font-body: "DM Sans", "Segoe UI", sans-serif;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+      body { font-family: var(--font-body); background: var(--bg); min-height: 100vh; display: flex; justify-content: center; }
+      .app { max-width: 430px; width: 100%; min-height: 100vh; background: #fafafa; position: relative; overflow-x: hidden; }
+
+      @keyframes slideUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes scaleIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+
+      /* Header */
+      .header {
+        background: linear-gradient(135deg, var(--red-dark), var(--red-mid));
+        padding: 20px 20px 32px;
+        position: relative;
+        overflow: hidden;
+      }
+      .header::after {
+        content: '';
+        position: absolute;
+        bottom: -40px;
+        left: -20px;
+        right: -20px;
+        height: 60px;
+        background: #fafafa;
+        border-radius: 50% 50% 0 0;
+      }
+      .header-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+      .user-info { display: flex; align-items: center; gap: 12px; }
+      .avatar {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: rgba(255,255,255,0.2); display: flex; align-items: center;
+        justify-content: center; font-weight: 700; color: #fff; font-size: 16px;
+        border: 2px solid rgba(255,255,255,0.3);
+      }
+      .user-name { color: #fff; font-size: 16px; font-weight: 700; }
+      .badges { display: flex; gap: 6px; margin-top: 4px; }
+      .badge-role {
+        background: rgba(255,255,255,0.2); color: #fff; padding: 2px 10px;
+        border-radius: 20px; font-size: 10px; font-weight: 600;
+      }
+      .badge-merchant-tag {
+        background: var(--orange-light); color: #fff; padding: 2px 10px;
+        border-radius: 20px; font-size: 10px; font-weight: 600;
+      }
+      .header-actions { display: flex; gap: 8px; }
+      .icon-btn {
+        width: 38px; height: 38px; border-radius: 50%;
+        background: rgba(255,255,255,0.15); border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center; color: #fff;
+        text-decoration: none;
+      }
+
+      /* Commission banner */
+      .commission-banner {
+        background: rgba(255,255,255,0.12); border-radius: 18px;
+        padding: 18px; margin-top: 16px; display: flex;
+        justify-content: space-between; align-items: center;
+        position: relative; z-index: 2; backdrop-filter: blur(10px);
+      }
+      .commission-label { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 500; }
+      .commission-amount { font-family: var(--font-display); font-size: 32px; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
+      .commission-currency { font-size: 14px; font-weight: 500; opacity: 0.6; margin-left: 4px; }
+      .trend-up { display: flex; align-items: center; gap: 4px; color: #69f0ae; font-size: 12px; font-weight: 700; }
+      .trend-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; text-align: right; }
+
+      /* Content */
+      .content { padding: 0 16px 100px; position: relative; z-index: 2; }
+      .page { display: none; }
+      .page.active { display: block; }
+
+      /* Section title */
+      .section-title {
+        font-size: 13px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.08em; color: var(--text-secondary); margin: 20px 0 12px;
+      }
+
+      /* KPI Grid */
+      .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: -12px; }
+      .card {
+        background: var(--card); border-radius: var(--radius);
+        padding: 18px 16px; box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+      .kpi-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+      .kpi-icon { width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+      .kpi-icon.red { background: var(--red-bg); }
+      .kpi-icon.green { background: var(--green-bg); }
+      .kpi-icon.orange { background: var(--orange-bg); }
+      .kpi-icon.blue { background: #e3f2fd; }
+      .kpi-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; }
+      .kpi-badge.success { background: var(--green-bg); color: var(--green); }
+      .kpi-badge.warning { background: var(--orange-bg); color: var(--orange); }
+      .kpi-value { font-size: 28px; font-weight: 800; font-family: var(--font-display); color: var(--text); letter-spacing: -0.03em; }
+      .kpi-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-top: 2px; }
+      .progress-track { height: 6px; background: #f0f0f0; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+      .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--red-mid), var(--red-light)); transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+
+      /* Quick actions */
+      .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+      .action-btn {
+        background: var(--card); border-radius: var(--radius-sm);
+        padding: 16px 14px; box-shadow: var(--shadow);
+        border: 1px solid var(--border); cursor: pointer;
+        display: flex; flex-direction: column; align-items: center;
+        gap: 8px; transition: transform 0.2s;
+      }
+      .action-btn:active { transform: scale(0.94); }
+      .action-emoji { font-size: 28px; }
+      .action-label { font-size: 12px; font-weight: 600; color: var(--text); text-align: center; }
+      .action-btn.red { border-bottom: 3px solid var(--red-mid); }
+      .action-btn.green { border-bottom: 3px solid var(--green); }
+
+      /* Activity */
+      .activity-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 0; border-bottom: 1px solid #f5f5f5;
+      }
+      .activity-icon {
+        width: 40px; height: 40px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center; font-size: 18px;
+      }
+      .activity-icon.merchant { background: var(--orange-bg); }
+      .activity-name { font-size: 14px; font-weight: 600; color: var(--text); }
+      .activity-detail { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+      .activity-meta { margin-left: auto; text-align: right; }
+      .activity-status { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+      .activity-status.inscrit { background: var(--orange-bg); color: var(--orange); }
+      .activity-status.actif { background: var(--green-bg); color: var(--green); }
+      .activity-status.suspendu { background: var(--red-bg); color: var(--red); }
+      .activity-date { font-size: 10px; color: var(--text-tertiary); margin-top: 4px; }
+
+      /* Merchant card */
+      .merchant-card {
+        background: var(--card); border-radius: var(--radius);
+        padding: 16px; box-shadow: var(--shadow);
+        border: 1px solid var(--border); margin-bottom: 12px;
+        display: flex; align-items: center; gap: 14px;
+      }
+      .merchant-avatar {
+        width: 46px; height: 46px; border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 16px; color: #fff; flex-shrink: 0;
+      }
+      .merchant-info { flex: 1; min-width: 0; }
+      .merchant-name { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .merchant-commerce { font-size: 11px; color: var(--orange); font-weight: 600; margin-top: 2px; }
+      .merchant-phone { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+      .merchant-meta { text-align: right; flex-shrink: 0; }
+      .merchant-docs { display: flex; gap: 4px; margin-top: 4px; justify-content: flex-end; }
+      .doc-badge { font-size: 9px; padding: 2px 6px; border-radius: 6px; font-weight: 600; }
+      .doc-badge.ok { background: var(--green-bg); color: var(--green); }
+      .doc-badge.missing { background: #f5f5f5; color: #ccc; }
+
+      /* Ranking */
+      .rank-item {
+        background: var(--card); border-radius: var(--radius);
+        padding: 14px 16px; box-shadow: var(--shadow);
+        border: 1px solid var(--border); margin-bottom: 10px;
+        display: flex; align-items: center; gap: 14px;
+      }
+      .rank-position { font-family: var(--font-display); font-size: 20px; font-weight: 800; color: var(--text-tertiary); width: 30px; text-align: center; }
+      .rank-position.gold { color: #FFD700; }
+      .rank-position.silver { color: #C0C0C0; }
+      .rank-position.bronze { color: #CD7F32; }
+      .rank-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; }
+      .rank-info { flex: 1; }
+      .rank-name { font-size: 14px; font-weight: 600; color: var(--text); }
+      .rank-detail { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+      .rank-score { font-size: 18px; font-weight: 800; font-family: var(--font-display); color: var(--text); }
+      .rank-you { background: var(--red-bg); border-color: rgba(229, 57, 53, 0.15); }
+
+      /* Bottom nav */
+      .bottom-nav {
+        position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+        max-width: 430px; width: 100%; background: #fff;
+        display: flex; justify-content: space-around; align-items: center;
+        padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+        border-top: 1px solid #f0f0f0;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.04); z-index: 100;
+      }
+      .nav-item {
+        display: flex; flex-direction: column; align-items: center;
+        color: var(--text-tertiary); text-decoration: none;
+        font-size: 10px; font-weight: 600; padding: 4px 12px;
+        position: relative; border: none; background: none; cursor: pointer;
+      }
+      .nav-item.active { color: var(--red-mid); }
+      .nav-item svg { margin-bottom: 3px; }
+      .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--red-mid); position: absolute; bottom: 0; }
+      .nav-center { display: flex; flex-direction: column; align-items: center; border: none; background: none; cursor: pointer; position: relative; top: -18px; }
+      .nav-center-btn {
+        width: 56px; height: 56px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--red), var(--red-mid));
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 6px 24px rgba(229, 57, 53, 0.35); color: #fff;
+      }
+      .nav-center .nav-label { color: var(--red-mid); font-weight: 600; margin-top: 5px; font-size: 10px; }
+
+      /* Modal */
+      .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.5); z-index: 200;
+        display: none; align-items: flex-end; justify-content: center;
+        animation: fadeIn 0.2s ease;
+      }
+      .modal-overlay.show { display: flex; }
+      .modal {
+        background: #fff; border-radius: 28px 28px 0 0;
+        width: 100%; max-width: 430px; max-height: 92vh; overflow-y: auto;
+        animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .modal-handle { width: 40px; height: 4px; background: #ddd; border-radius: 4px; margin: 12px auto 0; }
+      .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px 12px; }
+      .modal-title { font-size: 18px; font-weight: 700; color: var(--text); }
+      .modal-close {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: #f5f5f5; border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 18px; color: #999;
+      }
+      .modal-body { padding: 0 20px 32px; }
+      .form-group { margin-bottom: 18px; }
+      .form-label {
+        display: block; font-size: 12px; font-weight: 600; color: #666;
+        margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em;
+      }
+      .form-input {
+        width: 100%; padding: 14px 16px; border: 2px solid #eee;
+        border-radius: 14px; font-size: 15px; font-family: var(--font-body);
+        color: var(--text); outline: none; transition: border-color 0.2s; background: #fafafa;
+      }
+      .form-input:focus { border-color: var(--red-mid); background: #fff; }
+      .form-input::placeholder { color: #ccc; }
+      .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .btn {
+        width: 100%; padding: 16px; border: none; border-radius: 16px;
+        font-size: 15px; font-weight: 700; font-family: var(--font-body);
+        cursor: pointer; transition: transform 0.2s, opacity 0.2s;
+      }
+      .btn:active { transform: scale(0.97); }
+      .btn-primary {
+        background: linear-gradient(135deg, var(--red), var(--red-mid));
+        color: #fff; box-shadow: 0 4px 16px rgba(229, 57, 53, 0.3);
+      }
+      .btn-success {
+        background: linear-gradient(135deg, var(--green), var(--green-light));
+        color: #fff; box-shadow: 0 4px 16px rgba(46, 125, 50, 0.3);
+      }
+
+      /* Photo capture */
+      .photo-capture-group { margin-bottom: 18px; }
+      .photo-capture-label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.04em; }
+      .photo-capture-btn {
+        width: 100%; padding: 20px 16px; border: 2px dashed #ddd;
+        border-radius: 16px; background: #fafafa; cursor: pointer;
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        transition: all 0.2s; position: relative; overflow: hidden;
+      }
+      .photo-capture-btn:hover { border-color: var(--red-mid); background: #fff; }
+      .photo-capture-btn.has-photo { border-color: var(--green); border-style: solid; background: var(--green-bg); }
+      .photo-capture-btn .cam-icon { font-size: 28px; }
+      .photo-capture-btn .cam-label { font-size: 12px; font-weight: 600; color: #999; }
+      .photo-capture-btn.has-photo .cam-label { color: var(--green); }
+      .photo-preview {
+        width: 100%; max-height: 140px; object-fit: cover;
+        border-radius: 12px; margin-top: 8px; display: none;
+      }
+      .photo-capture-btn.has-photo .photo-preview { display: block; }
+
+      /* Toast */
+      .toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 300; width: 100%; max-width: 400px; padding: 0 16px; }
+      .toast {
+        padding: 14px 18px; border-radius: 16px; display: flex;
+        align-items: center; gap: 10px; font-size: 13px; font-weight: 600;
+        animation: slideDown 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        margin-bottom: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      }
+      .toast.success { background: #1b5e20; color: #fff; }
+      .toast.error { background: #b71c1c; color: #fff; }
+
+      /* Filter pills */
+      .filter-pills { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+      .filter-pills::-webkit-scrollbar { display: none; }
+      .pill {
+        padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        border: none; cursor: pointer; white-space: nowrap; transition: all 0.2s;
+        background: #f0f0f0; color: #666;
+      }
+      .pill.active { background: var(--red-mid); color: #fff; box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3); }
+
+      /* Search */
+      .search-bar {
+        display: flex; align-items: center; gap: 10px;
+        background: var(--card); border-radius: 16px;
+        padding: 4px 4px 4px 16px; border: 1px solid var(--border);
+        box-shadow: var(--shadow); margin-bottom: 16px;
+      }
+      .search-bar input {
+        flex: 1; border: none; background: none;
+        font-size: 14px; font-family: var(--font-body);
+        color: var(--text); outline: none; padding: 10px 0;
+      }
+      .search-bar input::placeholder { color: #ccc; }
+
+      /* Steps indicator */
+      .steps { display: flex; gap: 8px; margin-bottom: 20px; }
+      .step {
+        flex: 1; height: 4px; border-radius: 2px; background: #eee;
+        transition: background 0.3s;
+      }
+      .step.active { background: var(--red-mid); }
+      .step.done { background: var(--green); }
+
+      /* Messages Django */
+      .msg-toast { padding: 12px 16px; border-radius: 14px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+      .msg-toast.error { background: #ffebee; border: 1px solid #ffcdd2; color: #c62828; }
+      .msg-toast.success { background: #e8f5e9; border: 1px solid #c8e6c9; color: #2e7d32; }
+
+      /* Empty state */
+      .empty-state { text-align: center; padding: 40px 20px; }
+      .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+      .empty-state .empty-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+      .empty-state .empty-text { font-size: 13px; color: var(--text-secondary); }
+
+      @media (max-width: 360px) {
+        .commission-amount { font-size: 22px; }
+        .kpi-value { font-size: 22px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app" id="app">
+      <!-- Toast Container -->
+      <div class="toast-container" id="toastContainer"></div>
+
+      <!-- PAGE: ACCUEIL -->
+      <div class="page active" id="page-accueil">
+        <div class="header">
+          <div class="header-top">
+            <div class="user-info">
+              <div class="avatar" id="userAvatar"></div>
+              <div>
+                <div class="user-name" id="userName"></div>
+                <div class="badges">
+                  <span class="badge-role" id="userLevel"></span>
+                  <span class="badge-merchant-tag">🏪 Marchands</span>
+                </div>
+              </div>
+            </div>
+            <div class="header-actions">
+              <a href="/merchant/logout/" class="icon-btn" title="Déconnexion">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+          <div class="commission-banner">
+            <div>
+              <div class="commission-label">Marchands recrutés</div>
+              <div class="commission-amount">
+                <span id="totalMerchants">0</span>
+                <span class="commission-currency">total</span>
+              </div>
+            </div>
+            <div>
+              <div class="trend-up">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                  <polyline points="17 6 23 6 23 12"/>
+                </svg>
+                <span>Live</span>
+              </div>
+              <div class="trend-label">données temps réel</div>
+            </div>
+          </div>
+        </div>
+        <div class="content" id="accueilContent">
+          {% if messages %}{% for m in messages %}
+          <div class="msg-toast {% if m.tags == 'error' %}error{% else %}success{% endif %}">{{ m }}</div>
+          {% endfor %}{% endif %}
+        </div>
+      </div>
+
+      <!-- PAGE: MARCHANDS -->
+      <div class="page" id="page-marchands">
+        <div class="header" style="padding-bottom: 24px">
+          <div class="header-top">
+            <div style="color: #fff">
+              <div style="font-size: 20px; font-weight: 700">Mes Marchands</div>
+              <div style="font-size: 12px; opacity: 0.7; margin-top: 4px" id="merchantsCount"></div>
+            </div>
+            <button class="icon-btn" onclick="openModal('enrolModal')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="content" id="merchantsContent"></div>
+      </div>
+
+      <!-- PAGE: RANKING -->
+      <div class="page" id="page-ranking">
+        <div class="header" style="padding-bottom: 24px">
+          <div class="header-top">
+            <div style="color: #fff">
+              <div style="font-size: 20px; font-weight: 700">Classement</div>
+              <div style="font-size: 12px; opacity: 0.7; margin-top: 4px">Top recruteurs marchands</div>
+            </div>
+          </div>
+        </div>
+        <div class="content" id="rankingContent"></div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <nav class="bottom-nav">
+        <a href="/merchant/app/?tab=dashboard" class="nav-item {% if tab == 'dashboard' %}active{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="nav-label">Accueil</span>
+          {% if tab == 'dashboard' %}<div class="nav-dot"></div>{% endif %}
+        </a>
+        <a href="/merchant/app/?tab=merchants" class="nav-item {% if tab == 'merchants' %}active{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span class="nav-label">Marchands</span>
+          {% if tab == 'merchants' %}<div class="nav-dot"></div>{% endif %}
+        </a>
+        <button class="nav-center" onclick="openModal('enrolModal')">
+          <div class="nav-center-btn">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <line x1="12" y1="9" x2="12" y2="15"/>
+              <line x1="9" y1="12" x2="15" y2="12"/>
+            </svg>
+          </div>
+          <span class="nav-label">Recruter</span>
+        </button>
+        <a href="/merchant/app/?tab=ranking" class="nav-item {% if tab == 'ranking' %}active{% endif %}">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <span class="nav-label">Ranking</span>
+          {% if tab == 'ranking' %}<div class="nav-dot"></div>{% endif %}
+        </a>
+        <a href="/" class="nav-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          <span class="nav-label">App BA</span>
+        </a>
+      </nav>
+
+      <!-- ENROL MODAL (multi-step) -->
+      <div class="modal-overlay" id="enrolModal">
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <div class="modal-header">
+            <div class="modal-title">🏪 Recruter un marchand</div>
+            <button class="modal-close" onclick="closeModal('enrolModal')">✕</button>
+          </div>
+          <div class="modal-body">
+            <!-- Steps indicator -->
+            <div class="steps">
+              <div class="step active" id="step1Indicator"></div>
+              <div class="step" id="step2Indicator"></div>
+              <div class="step" id="step3Indicator"></div>
+            </div>
+
+            <form method="post" action="/merchant/app/enroll/" id="merchantForm" enctype="multipart/form-data">
+              {% csrf_token %}
+
+              <!-- STEP 1: Infos personnelles -->
+              <div id="step1">
+                <div class="section-title" style="margin-top:0;">Informations personnelles</div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Prénom</label>
+                    <input class="form-input" name="prenom" id="f_prenom" placeholder="Prénom" required/>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Nom</label>
+                    <input class="form-input" name="nom" id="f_nom" placeholder="Nom de famille" required/>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Téléphone personnel</label>
+                  <input class="form-input" name="telephone" id="f_telephone" placeholder="06 XXX XX XX" required/>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Adresse</label>
+                  <input class="form-input" name="adresse" id="f_adresse" placeholder="Quartier, avenue, repère…"/>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="goToStep(2)">Suivant →</button>
+              </div>
+
+              <!-- STEP 2: Infos commerce -->
+              <div id="step2" style="display:none;">
+                <div class="section-title" style="margin-top:0;">Informations commerce</div>
+                <div class="form-group">
+                  <label class="form-label">Numéro Marchand Airtel Money</label>
+                  <input class="form-input" name="numero_merchant" id="f_numero_merchant" placeholder="Ex: 242XXXXXX" required/>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nom du commerce</label>
+                  <input class="form-input" name="nom_commerce" id="f_nom_commerce" placeholder="Ex: Boutique Express" required/>
+                </div>
+                <div style="display:flex;gap:10px;">
+                  <button type="button" class="btn btn-secondary" style="background:#f5f5f5;color:var(--text);" onclick="goToStep(1)">← Retour</button>
+                  <button type="button" class="btn btn-primary" onclick="goToStep(3)">Suivant →</button>
+                </div>
+              </div>
+
+              <!-- STEP 3: Photos / Documents -->
+              <div id="step3" style="display:none;">
+                <div class="section-title" style="margin-top:0;">Documents & Photos</div>
+
+                <!-- Pièce d'identité - Recto -->
+                <div class="photo-capture-group">
+                  <div class="photo-capture-label">📄 Pièce d'identité — RECTO</div>
+                  <div class="photo-capture-btn" id="captureRectoBtn" onclick="capturePhoto('recto')">
+                    <div class="cam-icon">📷</div>
+                    <div class="cam-label">Appuyez pour prendre la photo</div>
+                    <img class="photo-preview" id="previewRecto"/>
+                  </div>
+                  <input type="hidden" name="photo_id_recto" id="photo_id_recto"/>
+                  <input type="file" id="fileRecto" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoCapture(this,'recto')"/>
+                </div>
+
+                <!-- Pièce d'identité - Verso -->
+                <div class="photo-capture-group">
+                  <div class="photo-capture-label">📄 Pièce d'identité — VERSO</div>
+                  <div class="photo-capture-btn" id="captureVersoBtn" onclick="capturePhoto('verso')">
+                    <div class="cam-icon">📷</div>
+                    <div class="cam-label">Appuyez pour prendre la photo</div>
+                    <img class="photo-preview" id="previewVerso"/>
+                  </div>
+                  <input type="hidden" name="photo_id_verso" id="photo_id_verso"/>
+                  <input type="file" id="fileVerso" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoCapture(this,'verso')"/>
+                </div>
+
+                <!-- RCCM -->
+                <div class="photo-capture-group">
+                  <div class="photo-capture-label">📋 RCCM (Document de commerce)</div>
+                  <div class="photo-capture-btn" id="captureRccmBtn" onclick="capturePhoto('rccm')">
+                    <div class="cam-icon">📷</div>
+                    <div class="cam-label">Appuyez pour prendre la photo</div>
+                    <img class="photo-preview" id="previewRccm"/>
+                  </div>
+                  <input type="hidden" name="photo_rccm" id="photo_rccm"/>
+                  <input type="file" id="fileRccm" accept="image/*" capture="environment" style="display:none;" onchange="handlePhotoCapture(this,'rccm')"/>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+                  <button type="button" class="btn btn-secondary" style="background:#f5f5f5;color:var(--text);" onclick="goToStep(2)">← Retour</button>
+                  <button type="submit" class="btn btn-success" id="submitMerchant">✅ Enregistrer le marchand</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ===== DJANGO DATA INJECTION =====
+      const Stats = {{ stats_json|safe }};
+      const Store = {
+        user: { name: Stats.name, role: Stats.level },
+        merchants: {{ merchants_json|safe }},
+        rankings: {{ rankings_json|safe }},
+        totalMerchants: Stats.totalMerchants || 0,
+        activeMerchants: Stats.activeMerchants || 0,
+        pendingMerchants: Stats.pendingMerchants || 0,
+      };
+
+      // ===== HELPERS =====
+      function formatMoney(n) { return Math.abs(n).toLocaleString('fr-FR'); }
+      function getInitials(name) { return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
+      function getAvatarColor(name) {
+        const colors = ['#E53935','#1565C0','#2E7D32','#F57F17','#7B1FA2','#00838F','#D84315','#4527A0'];
+        let hash = 0; for(let c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash);
+        return colors[Math.abs(hash) % colors.length];
+      }
+
+      // ===== TOAST =====
+      function showToast(msg, type='success') {
+        const icons = { success:'✅', error:'❌', info:'ℹ️' };
+        const c = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<span style="font-size:18px;flex-shrink:0;">${icons[type]}</span>${msg}`;
+        c.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; t.style.transform='translateY(-20px)'; t.style.transition='all 0.3s'; setTimeout(()=>t.remove(),300); }, 3000);
+      }
+
+      // ===== MODALS =====
+      function openModal(id) { document.getElementById(id).classList.add('show'); document.body.style.overflow='hidden'; resetForm(); }
+      function closeModal(id) { document.getElementById(id).classList.remove('show'); document.body.style.overflow=''; }
+      document.querySelectorAll('.modal-overlay').forEach(m => {
+        m.addEventListener('click', e => { if(e.target === m) closeModal(m.id); });
+      });
+
+      // ===== MULTI-STEP FORM =====
+      let currentStep = 1;
+      function goToStep(step) {
+        // Validate current step
+        if(step > currentStep) {
+          if(currentStep === 1) {
+            if(!document.getElementById('f_prenom').value.trim() || !document.getElementById('f_nom').value.trim() || !document.getElementById('f_telephone').value.trim()) {
+              showToast('Veuillez remplir tous les champs obligatoires', 'error'); return;
+            }
+          }
+          if(currentStep === 2) {
+            if(!document.getElementById('f_numero_merchant').value.trim() || !document.getElementById('f_nom_commerce').value.trim()) {
+              showToast('Veuillez remplir le numéro marchand et le nom du commerce', 'error'); return;
+            }
+          }
+        }
+        document.getElementById('step'+currentStep).style.display = 'none';
+        document.getElementById('step'+step).style.display = 'block';
+        // Update indicators
+        for(let i=1; i<=3; i++) {
+          const ind = document.getElementById('step'+i+'Indicator');
+          ind.className = 'step' + (i < step ? ' done' : (i === step ? ' active' : ''));
+        }
+        currentStep = step;
+      }
+
+      function resetForm() {
+        currentStep = 1;
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('step1Indicator').className = 'step active';
+        document.getElementById('step2Indicator').className = 'step';
+        document.getElementById('step3Indicator').className = 'step';
+      }
+
+      // ===== PHOTO CAPTURE =====
+      function capturePhoto(type) {
+        const fileMap = { recto:'fileRecto', verso:'fileVerso', rccm:'fileRccm' };
+        document.getElementById(fileMap[type]).click();
+      }
+
+      function handlePhotoCapture(input, type) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64 = e.target.result;
+          // Store in hidden field
+          const fieldMap = { recto:'photo_id_recto', verso:'photo_id_verso', rccm:'photo_rccm' };
+          document.getElementById(fieldMap[type]).value = base64;
+          // Show preview
+          const previewMap = { recto:'previewRecto', verso:'previewVerso', rccm:'previewRccm' };
+          document.getElementById(previewMap[type]).src = base64;
+          // Update button style
+          const btnMap = { recto:'captureRectoBtn', verso:'captureVersoBtn', rccm:'captureRccmBtn' };
+          const btn = document.getElementById(btnMap[type]);
+          btn.classList.add('has-photo');
+          btn.querySelector('.cam-label').textContent = '✅ Photo capturée — appuyez pour changer';
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // ===== TAB ROUTING =====
+      function initTab() {
+        const params = new URLSearchParams(window.location.search);
+        const tab = params.get('tab') || 'dashboard';
+        const tabMap = { dashboard:'accueil', merchants:'marchands', ranking:'ranking' };
+        const page = tabMap[tab] || 'accueil';
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+
+        if(page === 'accueil') renderAccueil();
+        if(page === 'marchands') renderMarchands();
+        if(page === 'ranking') renderRanking();
+      }
+
+      // ===== RENDER: ACCUEIL =====
+      function renderAccueil() {
+        const total = Store.totalMerchants;
+        const actifs = Store.activeMerchants;
+        const pending = Store.pendingMerchants;
+        const rate = total > 0 ? Math.round((actifs / total) * 100) : 0;
+
+        document.getElementById('userName').textContent = Store.user.name;
+        document.getElementById('userAvatar').textContent = getInitials(Store.user.name);
+        document.getElementById('userLevel').textContent = Store.user.role;
+        document.getElementById('totalMerchants').textContent = total;
+
+        // Keep Django messages
+        const msgs = document.getElementById('accueilContent').querySelectorAll('.msg-toast');
+        let msgsHtml = '';
+        msgs.forEach(m => msgsHtml += m.outerHTML);
+
+        document.getElementById('accueilContent').innerHTML = `
+          ${msgsHtml}
+          <div class="kpi-grid">
+            <a href="/merchant/app/?tab=merchants" class="card" style="text-decoration:none;animation:slideUp 0.5s 0.15s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="kpi-top">
+                <div class="kpi-icon orange">🏪</div>
+                <span class="kpi-badge ${rate>50?'success':'warning'}">${rate}% actifs</span>
+              </div>
+              <div class="kpi-value">${actifs}</div>
+              <div class="kpi-label">marchands actifs</div>
+              <div class="progress-track"><div class="progress-fill" style="width:${rate}%;"></div></div>
+            </a>
+            <div class="card" style="animation:slideUp 0.5s 0.22s cubic-bezier(0.16,1,0.3,1) backwards;">
+              <div class="kpi-top">
+                <div class="kpi-icon blue">⏳</div>
+              </div>
+              <div class="kpi-value">${pending}</div>
+              <div class="kpi-label">en attente validation</div>
+            </div>
+            <div class="card" style="animation:slideUp 0.5s 0.29s cubic-bezier(0.16,1,0.3,1) backwards;grid-column:1/-1;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <div class="kpi-icon green">📊</div>
+                <div>
+                  <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#999;">Total recrutés</div>
+                  <div class="kpi-value">${total}</div>
+                </div>
+              </div>
+              <div class="kpi-label">marchands enrôlés au total</div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="section-title">Actions rapides</div>
+          <div class="quick-actions">
+            <div class="action-btn red" onclick="openModal('enrolModal')">
+              <div class="action-emoji">🏪</div>
+              <div class="action-label">Recruter un marchand</div>
+            </div>
+            <a href="/merchant/app/?tab=merchants" class="action-btn green" style="text-decoration:none;">
+              <div class="action-emoji">📋</div>
+              <div class="action-label">Voir mes marchands</div>
+            </a>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="section-title">Activité récente</div>
+          <div class="card" style="animation:slideUp 0.5s 0.4s cubic-bezier(0.16,1,0.3,1) backwards;">
+            ${Store.merchants.length === 0 ?
+              '<div class="empty-state"><div class="empty-icon">🏪</div><div class="empty-title">Aucun marchand</div><div class="empty-text">Commencez à recruter des marchands !</div></div>'
+            : Store.merchants.slice(0, 5).map(m => `
+              <div class="activity-item">
+                <div class="activity-icon merchant">🏪</div>
+                <div>
+                  <div class="activity-name">${m.name}</div>
+                  <div class="activity-detail">${m.nom_commerce} • ${m.numero_merchant}</div>
+                </div>
+                <div class="activity-meta">
+                  <div class="activity-status ${m.status}">${m.status === 'actif' ? 'Actif' : m.status === 'inscrit' ? 'Inscrit' : m.status}</div>
+                  <div class="activity-date">${m.date}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      // ===== RENDER: MARCHANDS =====
+      function renderMarchands() {
+        const merchants = Store.merchants;
+        document.getElementById('merchantsCount').textContent = `${merchants.length} marchand${merchants.length > 1 ? 's' : ''} recrutés`;
+
+        let filter = 'tous';
+        const content = document.getElementById('merchantsContent');
+
+        function renderList(f) {
+          filter = f;
+          const filtered = f === 'tous' ? merchants : merchants.filter(m => m.status === f);
+
+          content.innerHTML = `
+            <div class="filter-pills">
+              <button class="pill ${f==='tous'?'active':''}" onclick="filterMerchants('tous')">Tous (${merchants.length})</button>
+              <button class="pill ${f==='inscrit'?'active':''}" onclick="filterMerchants('inscrit')">En attente (${merchants.filter(m=>m.status==='inscrit').length})</button>
+              <button class="pill ${f==='actif'?'active':''}" onclick="filterMerchants('actif')">Actifs (${merchants.filter(m=>m.status==='actif').length})</button>
+            </div>
+            <div class="search-bar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input placeholder="Rechercher un marchand…" oninput="searchMerchants(this.value)"/>
+            </div>
+            <div id="merchantsList">
+              ${renderMerchantCards(filtered)}
+            </div>
+          `;
+        }
+
+        window.filterMerchants = renderList;
+        window.searchMerchants = function(q) {
+          q = q.toLowerCase();
+          const filtered = merchants.filter(m =>
+            (filter === 'tous' || m.status === filter) &&
+            (m.name.toLowerCase().includes(q) || m.nom_commerce.toLowerCase().includes(q) || m.numero_merchant.includes(q))
+          );
+          document.getElementById('merchantsList').innerHTML = renderMerchantCards(filtered);
+        };
+
+        renderList('tous');
+      }
+
+      function renderMerchantCards(list) {
+        if(list.length === 0) return '<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Aucun résultat</div></div>';
+        return list.map(m => `
+          <div class="merchant-card">
+            <div class="merchant-avatar" style="background:${getAvatarColor(m.name)}">${getInitials(m.name)}</div>
+            <div class="merchant-info">
+              <div class="merchant-name">${m.name}</div>
+              <div class="merchant-commerce">🏪 ${m.nom_commerce}</div>
+              <div class="merchant-phone">📱 ${m.telephone} • #${m.numero_merchant}</div>
+            </div>
+            <div class="merchant-meta">
+              <div class="activity-status ${m.status}">${m.status === 'actif' ? 'Actif' : m.status === 'inscrit' ? 'Inscrit' : m.status}</div>
+              <div class="merchant-docs">
+                <span class="doc-badge ${m.has_photo_id ? 'ok' : 'missing'}">${m.has_photo_id ? '✅' : '❌'} ID</span>
+                <span class="doc-badge ${m.has_rccm ? 'ok' : 'missing'}">${m.has_rccm ? '✅' : '❌'} RCCM</span>
+              </div>
+              <div class="activity-date">${m.date}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // ===== RENDER: RANKING =====
+      function renderRanking() {
+        const rankings = Store.rankings;
+        const content = document.getElementById('rankingContent');
+
+        if(rankings.length === 0) {
+          content.innerHTML = '<div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-title">Pas encore de classement</div><div class="empty-text">Recrutez des marchands pour apparaître ici !</div></div>';
+          return;
+        }
+
+        content.innerHTML = rankings.map((r, i) => {
+          const posClass = i === 0 ? 'gold' : (i === 1 ? 'silver' : (i === 2 ? 'bronze' : ''));
+          const medals = ['🥇','🥈','🥉'];
+          return `
+            <div class="rank-item ${r.isYou ? 'rank-you' : ''}">
+              <div class="rank-position ${posClass}">${i < 3 ? medals[i] : (i+1)}</div>
+              <div class="rank-avatar" style="background:${getAvatarColor(r.name)}">${getInitials(r.name)}</div>
+              <div class="rank-info">
+                <div class="rank-name">${r.name} ${r.isYou ? '(vous)' : ''}</div>
+                <div class="rank-detail">${r.total} marchand${r.total > 1 ? 's' : ''} recrutés</div>
+              </div>
+              <div class="rank-score">${r.total}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // ===== FORM SUBMISSION =====
+      document.getElementById('merchantForm').addEventListener('submit', function(e) {
+        const btn = document.getElementById('submitMerchant');
+        btn.disabled = true;
+        btn.textContent = '⏳ Enregistrement…';
+      });
+
+      // ===== INIT =====
+      initTab();
+    </script>
+  </body>
+</html>

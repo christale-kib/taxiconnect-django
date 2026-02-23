@@ -154,6 +154,11 @@ def get_dashboard_payload(user):
     ).filter(Q(statut__in=["ACTIF", "ACTIVE"]) | Q(date_activation__isnull=False)).count()
     total_passengers = Passagers.objects.filter(ba_id=ba.id).count()
 
+    # Marchands recrutés par ce BA
+    from merchant.models import Merchant
+    ba_email = (ba.email or "").strip().lower()
+    total_merchants = Merchant.objects.filter(ba_email=ba_email).count()
+
     monthly_commission = Commissions.objects.filter(
         ba_id=ba.id, created_at__gte=month_start
     ).aggregate(s=Sum("montant"))["s"] or 0
@@ -182,6 +187,7 @@ def get_dashboard_payload(user):
         "totalDrivers": total_drivers,
         "activeDrivers": active_drivers,
         "totalPassengers": total_passengers,
+        "totalMerchants": total_merchants,
         "monthlyCommission": float(monthly_commission),
         "pendingCommission": float(pending_commission),
         "streak": ba.serie_jours or 0,

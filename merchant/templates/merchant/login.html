@@ -1,0 +1,83 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Merchant App - Airtel Money</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red-dark:#b71c1c; --red:#c62828; --red-mid:#e53935; --red-light:#ef5350; --red-bg:#ffebee;
+      --green:#2e7d32; --green-light:#43a047; --green-bg:#e8f5e9;
+      --orange:#e65100; --orange-light:#ff6f00;
+      --bg:#f5f5f7; --card:#fff; --text:#1a1a1a; --text-secondary:#999;
+      --border:rgba(0,0,0,0.04); --shadow:0 2px 16px rgba(0,0,0,0.04);
+      --radius:22px; --radius-sm:14px;
+      --font-display:"Outfit",sans-serif; --font-body:"DM Sans","Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+    body{font-family:var(--font-body);background:var(--bg);min-height:100vh;display:flex;justify-content:center;align-items:center;}
+    .login-container{max-width:400px;width:100%;padding:20px;}
+    .login-card{background:var(--card);border-radius:var(--radius);padding:40px 28px;box-shadow:0 8px 40px rgba(0,0,0,0.08);border:1px solid var(--border);}
+    .logo-section{text-align:center;margin-bottom:32px;}
+    .logo-icon{width:64px;height:64px;background:linear-gradient(135deg,var(--red),var(--red-mid));border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(229,57,53,0.3);}
+    .logo-icon svg{color:#fff;}
+    .logo-title{font-family:var(--font-display);font-size:24px;font-weight:800;color:var(--text);}
+    .logo-subtitle{font-size:13px;color:var(--text-secondary);margin-top:4px;}
+    .form-group{margin-bottom:18px;}
+    .form-label{display:block;font-size:12px;font-weight:600;color:#666;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;}
+    .form-input{width:100%;padding:14px 16px;border:2px solid #eee;border-radius:14px;font-size:15px;font-family:var(--font-body);color:var(--text);outline:none;transition:border-color 0.2s;background:#fafafa;}
+    .form-input:focus{border-color:var(--red-mid);background:#fff;}
+    .form-input::placeholder{color:#ccc;}
+    .btn{width:100%;padding:16px;border:none;border-radius:16px;font-size:15px;font-weight:700;font-family:var(--font-body);cursor:pointer;transition:transform 0.2s,opacity 0.2s;}
+    .btn:active{transform:scale(0.97);}
+    .btn-primary{background:linear-gradient(135deg,var(--red),var(--red-mid));color:#fff;box-shadow:0 4px 16px rgba(229,57,53,0.3);}
+    .error-msg{background:#ffebee;color:#c62828;padding:12px 16px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:16px;text-align:center;}
+    .back-link{text-align:center;margin-top:20px;}
+    .back-link a{color:var(--text-secondary);font-size:13px;text-decoration:none;}
+    .back-link a:hover{color:var(--red-mid);}
+    .badge-merchant{display:inline-flex;align-items:center;gap:6px;background:var(--orange-light);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-top:8px;}
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="logo-title">Merchant App</div>
+        <div class="logo-subtitle">Recrutement Marchands Airtel Money</div>
+        <div class="badge-merchant">🏪 Espace Marchand</div>
+      </div>
+
+      {% if messages %}
+        {% for m in messages %}
+          <div class="error-msg">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="login"/>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" name="email" placeholder="votre@email.com" required/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mot de passe</label>
+          <input class="form-input" type="password" name="password" placeholder="••••••••" required/>
+        </div>
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+      </form>
+
+      <div class="back-link">
+        <a href="/">← Retour à l'app BA</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

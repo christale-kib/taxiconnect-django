@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "taxi",
     "manager",
+    "merchant",
 ]
 
 MIDDLEWARE = [
@@ -169,3 +170,6 @@ LOGIN_URL = "/manager/"
 
 import pymysql
 pymysql.install_as_MySQLdb()
+
+# Allow large POST data for merchant photo uploads (base64)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400  # 25 MB

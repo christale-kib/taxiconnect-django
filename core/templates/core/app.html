@@ -1539,37 +1539,6 @@
                 Enrôler le chauffeur (+1 000 XAF)
               </button>
             </form>
-            <div style="height: 1px; background: #eee; margin: 20px 0"></div>
-            <div
-              class="modal-title"
-              style="font-size: 16px; margin-bottom: 14px"
-            >
-              Enrôler un passager
-            </div>
-            <form method="post" action="/app/enroll/passenger/">
-              {% csrf_token %}
-              <div class="form-group">
-                <label class="form-label">Nom complet</label>
-                <input
-                  class="form-input"
-                  name="name"
-                  placeholder="Nom du passager"
-                  required
-                />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Téléphone</label>
-                <input
-                  class="form-input"
-                  name="phone"
-                  placeholder="06 XXX XX XX"
-                  required
-                />
-              </div>
-              <button type="submit" class="btn btn-success">
-                Enrôler le passager (+500 XAF)
-              </button>
-            </form>
           </div>
         </div>
       </div>
@@ -1656,6 +1625,7 @@
         totalDrivers: BA.totalDrivers || 0,
         activeDrivers: BA.activeDrivers || 0,
         totalPassengers: BA.totalPassengers || 0,
+        totalMerchants: BA.totalMerchants || 0,
       };
 
       // ===== HELPERS =====
@@ -1707,7 +1677,6 @@
       function renderAccueil() {
         const actifs = Store.activeDrivers;
         const totalDrivers = Store.totalDrivers;
-        const passengers = Store.totalPassengers;
         const objPct = Store.targetProgress;
         const commission = Store.monthlyCommission;
         const rate = totalDrivers > 0 ? Math.round((actifs / totalDrivers) * 100) : 0;
@@ -1737,17 +1706,17 @@
               <div class="kpi-label">sur ${totalDrivers} chauffeurs</div>
               <div class="progress-track"><div class="progress-fill" style="width:${rate}%;"></div></div>
             </a>
-            <div class="card" style="animation:slideUp 0.5s 0.22s cubic-bezier(0.16,1,0.3,1) backwards;">
+            <a href="/merchant/app/" class="card" style="text-decoration:none;animation:slideUp 0.5s 0.22s cubic-bezier(0.16,1,0.3,1) backwards;">
               <div class="kpi-top">
-                <div class="kpi-icon green">👥</div>
+                <div class="kpi-icon green">🏪</div>
               </div>
-              <div class="kpi-value">${passengers}</div>
-              <div class="kpi-label">passagers recrutés</div>
+              <div class="kpi-value">${Store.totalMerchants}</div>
+              <div class="kpi-label">marchands recrutés</div>
               <div class="trend-indicator up">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                données en temps réel
+                voir détails →
               </div>
-            </div>
+            </a>
             <div class="card" style="animation:slideUp 0.5s 0.29s cubic-bezier(0.16,1,0.3,1) backwards;">
               <div style="display:flex;align-items:center;gap:8px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="#FF6F00"><path d="M12 23c-3.9 0-7-3.1-7-7 0-3.2 2.1-5.8 3.5-7.5.4-.5 1.3-.2 1.3.5 0 1.1.8 2 1.8 2 .3 0 .6-.1.8-.2.5-.3.6-.9.4-1.4C11.5 6.8 11 4.3 13 1c.3-.4.9-.5 1.2-.1C17.4 4.3 19 8.3 19 12c0 3.3-1.3 5.5-2.8 7-.4.4-1 .1-1-.4 0-.8-.2-1.6-.7-2.2-.2-.2-.6-.3-.9-.1-1.1.8-1.6 2-1.6 3.2 0 1.9-1.6 3.5-3.5 3.5H12z"/></svg>
@@ -1780,10 +1749,10 @@
               <div class="action-emoji">🚕</div>
               <div class="action-label">Chauffeur</div>
             </div>
-            <div class="action-btn blue" onclick="openModal('enrolModal')">
-              <div class="action-emoji">👤</div>
-              <div class="action-label">Passager</div>
-            </div>
+            <a href="/merchant/app/" class="action-btn blue" style="text-decoration:none;">
+              <div class="action-emoji">🏪</div>
+              <div class="action-label">Merchant</div>
+            </a>
             <a href="/app/?tab=commissions" class="action-btn green" style="text-decoration:none;">
               <div class="action-emoji">💰</div>
               <div class="action-label">Mes gains</div>
