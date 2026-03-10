@@ -6,17 +6,17 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>Brand Ambassador - Airtel Money</title>
+    <title>Brand Ambassador - MTN MoMo</title>
     <link
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --red-dark: #b71c1c;
-        --red: #c62828;
-        --red-mid: #e53935;
-        --red-light: #ef5350;
+        --red-dark: #e65100;
+        --red: #f9a825;
+        --red-mid: #ffc107;
+        --red-light: #ffd740;
         --red-bg: #ffebee;
         --green: #2e7d32;
         --green-light: #43a047;
@@ -103,12 +103,12 @@
         0%,
         100% {
           box-shadow:
-            0 4px 16px rgba(229, 57, 53, 0.4),
-            0 0 0 0 rgba(229, 57, 53, 0.3);
+            0 4px 16px rgba(255, 193, 7, 0.4),
+            0 0 0 0 rgba(255, 193, 7, 0.35);
         }
         50% {
           box-shadow:
-            0 4px 16px rgba(229, 57, 53, 0.4),
+            0 4px 16px rgba(255, 193, 7, 0.4),
             0 0 0 14px rgba(229, 57, 53, 0);
         }
       }
@@ -785,8 +785,8 @@
       }
       .btn-primary {
         background: linear-gradient(135deg, var(--red), var(--red-mid));
-        color: #fff;
-        box-shadow: 0 4px 16px rgba(229, 57, 53, 0.3);
+        color: #1a1a1a;
+        box-shadow: 0 4px 16px rgba(255, 193, 7, 0.35);
       }
       .btn-success {
         background: linear-gradient(135deg, var(--green), var(--green-light));
@@ -826,7 +826,7 @@
         color: #fff;
       }
       .toast.error {
-        background: #b71c1c;
+        background: #e65100;
         color: #fff;
       }
       .toast.info {
@@ -860,7 +860,7 @@
       .pill.active {
         background: var(--red-mid);
         color: #fff;
-        box-shadow: 0 2px 8px rgba(229, 57, 53, 0.3);
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.35);
       }
       .search-bar {
         display: flex;
@@ -1196,7 +1196,7 @@
       .msg-toast.error {
         background: #ffebee;
         border: 1px solid #ffcdd2;
-        color: #c62828;
+        color: #f9a825;
       }
       .msg-toast.success {
         background: #e8f5e9;
@@ -1591,7 +1591,7 @@
                 />
               </div>
               <div class="form-group">
-                <label class="form-label">Numéro Airtel Money</label>
+                <label class="form-label">Numéro MTN MoMo</label>
                 <input
                   class="form-input"
                   type="tel"
@@ -1635,7 +1635,7 @@
       function formatMoney(n) { return Math.abs(n).toLocaleString('fr-FR'); }
       function getInitials(name) { return name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase(); }
       function getAvatarColor(name) {
-        const colors = ['#E53935','#1565C0','#2E7D32','#F57F17','#7B1FA2','#00838F','#D84315','#4527A0'];
+        const colors = ['#FFC107','#1565C0','#2E7D32','#F57F17','#7B1FA2','#00838F','#D84315','#4527A0'];
         let hash = 0; for(let c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash);
         return colors[Math.abs(hash) % colors.length];
       }
@@ -1730,7 +1730,7 @@
               <div style="position:relative;display:flex;align-items:center;justify-content:center;">
                 <svg width="72" height="72" style="transform:rotate(-90deg);">
                   <circle cx="36" cy="36" r="29" fill="none" stroke="#f0f0f0" stroke-width="7"/>
-                  <circle cx="36" cy="36" r="29" fill="none" stroke="${objPct>=100?'#43A047':'#E53935'}" stroke-width="7"
+                  <circle cx="36" cy="36" r="29" fill="none" stroke="${objPct>=100?'#43A047':'#FFC107'}" stroke-width="7"
                     stroke-dasharray="182.21" stroke-dashoffset="${182.21*(1-Math.min(objPct,100)/100)}"
                     stroke-linecap="round" style="--circumference:182.21;--target-offset:${182.21*(1-Math.min(objPct,100)/100)};animation:circleProgress 1.4s 0.5s cubic-bezier(0.16,1,0.3,1) backwards;"/>
                 </svg>

@@ -1,0 +1,2205 @@
+<!doctype html>
+{% load static %}
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>MTN MoMo — Merchant Dashboard</title>
+    <meta name="csrf-token" content="{{ csrf_token }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #1a1f2e;
+        --bg-secondary: #1e2536;
+        --bg-card: #252d40;
+        --bg-card-hover: #2c3550;
+        --bg-elevated: #313b52;
+        --border: #3a4562;
+        --border-light: #47536e;
+        --text-primary: #f4f6fb;
+        --text-secondary: #9ba5c0;
+        --text-tertiary: #6b7894;
+        --yellow: #ffc107;
+        --yellow-dim: rgba(255, 193, 7, 0.12);
+        --yellow-glow: rgba(255, 193, 7, 0.25);
+        --green: #34d399;
+        --green-dim: rgba(52, 211, 153, 0.12);
+        --green-glow: rgba(52, 211, 153, 0.2);
+        --amber: #fbbf24;
+        --amber-dim: rgba(251, 191, 36, 0.12);
+        --blue: #60a5fa;
+        --blue-dim: rgba(96, 165, 250, 0.12);
+        --purple: #a78bfa;
+        --purple-dim: rgba(167, 139, 250, 0.12);
+        --cyan: #22d3ee;
+        --cyan-dim: rgba(34, 211, 238, 0.12);
+        --red: #f87171;
+        --red-dim: rgba(248, 113, 113, 0.12);
+        --font-display: "Outfit", sans-serif;
+        --font-body: "DM Sans", sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+        --radius: 16px;
+        --radius-sm: 10px;
+        --radius-xs: 6px;
+        --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.4);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        font-family: var(--font-body);
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        min-height: 100vh;
+      }
+      ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+      button {
+        font-family: var(--font-body);
+        cursor: pointer;
+      }
+      input,
+      select {
+        font-family: var(--font-body);
+      }
+
+      /* === Layout === */
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 240px;
+        background: var(--bg-secondary);
+        border-right: 1px solid var(--border);
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 50;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .main {
+        flex: 1;
+        margin-left: 240px;
+        min-height: 100vh;
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: rgba(26, 31, 46, 0.88);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .page-content {
+        padding: 20px 24px 40px;
+      }
+
+      /* === Sidebar === */
+      .sidebar-logo {
+        padding: 0 20px 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 8px;
+      }
+      .sidebar-logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--yellow), #ffd600);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .sidebar-logo-text {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 15px;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+      }
+      .sidebar-logo-sub {
+        font-size: 9px;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-top: 1px;
+      }
+      .sidebar-section {
+        padding: 12px 12px 4px;
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .sidebar-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 16px;
+        margin: 1px 8px;
+        border-radius: var(--radius-sm);
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 500;
+        border: none;
+        background: none;
+        width: calc(100% - 16px);
+        text-align: left;
+        transition: all 0.15s;
+        cursor: pointer;
+      }
+      .sidebar-item:hover {
+        background: var(--bg-card);
+        color: var(--text-primary);
+      }
+      .sidebar-item.active {
+        background: var(--yellow-dim);
+        color: var(--yellow);
+        font-weight: 600;
+      }
+      .sidebar-item.active .nav-icon {
+        color: var(--yellow);
+      }
+      .nav-icon {
+        color: var(--text-tertiary);
+        transition: color 0.15s;
+        flex-shrink: 0;
+        font-size: 16px;
+        width: 18px;
+        text-align: center;
+      }
+      .sidebar-badge {
+        margin-left: auto;
+        background: var(--yellow);
+        color: #1a1a1a;
+        font-size: 9px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 10px;
+        min-width: 18px;
+        text-align: center;
+      }
+      .sidebar-footer {
+        margin-top: auto;
+        padding: 16px;
+        border-top: 1px solid var(--border);
+      }
+      .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .sidebar-user:hover {
+        background: var(--bg-card);
+      }
+      .sidebar-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--yellow), #ffd600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 13px;
+        color: #1a1a1a;
+      }
+      .sidebar-user-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+      .sidebar-user-role {
+        font-size: 10px;
+        color: var(--text-tertiary);
+        margin-top: 1px;
+      }
+
+      /* Mobile */
+      .hamburger {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        padding: 4px;
+        font-size: 22px;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 49;
+      }
+
+      /* === Topbar === */
+      .topbar-title {
+        font-family: var(--font-display);
+        font-weight: 700;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .topbar-search {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 7px 12px;
+        min-width: 220px;
+        transition: border-color 0.2s;
+      }
+      .topbar-search:focus-within {
+        border-color: var(--yellow);
+      }
+      .topbar-search input {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        outline: none;
+        width: 100%;
+      }
+      .topbar-search input::placeholder {
+        color: var(--text-tertiary);
+      }
+      .topbar-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius-sm);
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+        font-size: 16px;
+        position: relative;
+        transition: all 0.15s;
+        cursor: pointer;
+      }
+      .topbar-btn:hover {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+      }
+      .topbar-btn .dot {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 7px;
+        height: 7px;
+        background: var(--yellow);
+        border-radius: 50%;
+        border: 2px solid var(--bg-primary);
+      }
+      .period-selector {
+        display: flex;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+      }
+      .period-btn {
+        padding: 7px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-tertiary);
+        background: none;
+        border: none;
+        transition: all 0.15s;
+        cursor: pointer;
+      }
+      .period-btn:hover {
+        color: var(--text-secondary);
+      }
+      .period-btn.active {
+        background: var(--yellow-dim);
+        color: var(--yellow);
+      }
+
+      /* === KPI Cards === */
+      .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .kpi {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 16px;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+      .kpi:hover {
+        border-color: var(--border-light);
+        background: var(--bg-card-hover);
+      }
+      .kpi-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+      .kpi-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .kpi-change {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 7px;
+        border-radius: var(--radius-xs);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+      .kpi-change.up {
+        background: var(--green-dim);
+        color: var(--green);
+      }
+      .kpi-change.down {
+        background: var(--red-dim);
+        color: var(--red);
+      }
+      .kpi-change.neutral {
+        background: var(--amber-dim);
+        color: var(--amber);
+      }
+      .kpi-value {
+        font-size: 26px;
+        font-weight: 800;
+        font-family: var(--font-display);
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+      .kpi-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+        font-weight: 500;
+      }
+      .kpi-glow {
+        position: absolute;
+        top: -30px;
+        right: -30px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        filter: blur(30px);
+        opacity: 0.15;
+        pointer-events: none;
+      }
+
+      /* === Grids === */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+
+      /* === Card === */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        margin-bottom: 14px;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+      .card-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card-action {
+        font-size: 11px;
+        color: var(--text-tertiary);
+        font-weight: 600;
+        border: none;
+        background: none;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        transition: color 0.15s;
+        cursor: pointer;
+      }
+      .card-action:hover {
+        color: var(--text-secondary);
+      }
+      .card-body {
+        padding: 16px;
+      }
+
+      /* === Status Badges === */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .badge-actif {
+        background: var(--green-dim);
+        color: var(--green);
+      }
+      .badge-inscrit {
+        background: var(--yellow-dim);
+        color: var(--yellow);
+      }
+      .badge-suspendu {
+        background: var(--red-dim);
+        color: var(--red);
+      }
+      .badge-rejete {
+        background: rgba(107, 120, 148, 0.12);
+        color: var(--text-tertiary);
+      }
+
+      /* === Table === */
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .data-table th {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 8px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      .data-table td {
+        padding: 10px 12px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid rgba(58, 69, 98, 0.5);
+      }
+      .data-table tr:hover td {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+      }
+      .data-table tr:last-child td {
+        border-bottom: none;
+      }
+      .table-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 700;
+        margin-right: 8px;
+        flex-shrink: 0;
+        color: #fff;
+      }
+      .table-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 12px;
+      }
+      .table-mono {
+        font-family: var(--font-mono);
+        font-size: 11px;
+      }
+      .table-row-clickable {
+        cursor: pointer;
+      }
+
+      /* === Chart Bars === */
+      .bar-group {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        height: 120px;
+        padding: 0 4px;
+      }
+      .bar-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        flex: 1;
+      }
+      .bar-val {
+        font-size: 9px;
+        font-family: var(--font-mono);
+        color: var(--text-tertiary);
+      }
+      .bar {
+        border-radius: 4px 4px 0 0;
+        width: 100%;
+        min-height: 4px;
+      }
+      .bar-lbl {
+        font-size: 9px;
+        color: var(--text-tertiary);
+      }
+
+      /* === Donut Chart === */
+      .donut-wrap {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 16px;
+      }
+      .donut-svg {
+        flex-shrink: 0;
+      }
+      .donut-legend {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .donut-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+      .donut-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .donut-label {
+        color: var(--text-secondary);
+      }
+      .donut-value {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-left: auto;
+      }
+
+      /* === Filters === */
+      .filter-bar {
+        display: flex;
+        gap: 8px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .filter-btn {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        background: none;
+        color: var(--text-secondary);
+        transition: all 0.15s;
+        cursor: pointer;
+      }
+      .filter-btn:hover {
+        border-color: var(--border-light);
+        color: var(--text-primary);
+      }
+      .filter-btn.active {
+        background: var(--yellow-dim);
+        border-color: var(--yellow);
+        color: var(--yellow);
+      }
+      .filter-search {
+        flex: 1;
+        min-width: 160px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xs);
+        padding: 5px 10px;
+      }
+      .filter-search input {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 12px;
+        outline: none;
+        width: 100%;
+      }
+      .filter-search input::placeholder {
+        color: var(--text-tertiary);
+      }
+
+      /* === Leaderboard === */
+      .rank-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 12px;
+      }
+      .rank-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: var(--radius-sm);
+        transition: background 0.15s;
+      }
+      .rank-item:hover {
+        background: var(--bg-elevated);
+      }
+      .rank-num {
+        width: 22px;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--text-tertiary);
+        font-family: var(--font-mono);
+        text-align: center;
+      }
+      .rank-num.top {
+        color: var(--yellow);
+      }
+      .rank-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: #1a1a1a;
+        flex-shrink: 0;
+      }
+      .rank-name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+        flex: 1;
+      }
+      .rank-count {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+      .rank-you {
+        font-size: 9px;
+        color: var(--yellow);
+        font-weight: 700;
+        margin-left: 4px;
+      }
+
+      /* === Merchant Detail Panel === */
+      .detail-panel {
+        position: fixed;
+        top: 0;
+        right: -420px;
+        width: 420px;
+        height: 100vh;
+        background: var(--bg-secondary);
+        border-left: 1px solid var(--border);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow-y: auto;
+      }
+      .detail-panel.open {
+        right: 0;
+      }
+      .detail-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        background: var(--bg-secondary);
+        z-index: 10;
+      }
+      .detail-close {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        color: var(--text-secondary);
+      }
+      .detail-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, var(--yellow), #ffd600);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 800;
+        color: #1a1a1a;
+        font-family: var(--font-display);
+      }
+      .detail-info {
+        flex: 1;
+        margin-left: 14px;
+      }
+      .detail-name {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: -0.02em;
+      }
+      .detail-sub {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+      .detail-section {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .detail-section-title {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 10px;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(58, 69, 98, 0.4);
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-key {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+      .detail-val {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-primary);
+        font-family: var(--font-mono);
+      }
+      .photo-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 8px;
+      }
+      .photo-slot {
+        border: 1px dashed var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        text-align: center;
+        font-size: 10px;
+        color: var(--text-tertiary);
+      }
+      .photo-slot.has-photo {
+        border-color: var(--green);
+        color: var(--green);
+        background: var(--green-dim);
+      }
+
+      /* === Action buttons === */
+      .action-btn-sm {
+        padding: 6px 14px;
+        border-radius: var(--radius-xs);
+        font-size: 11px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .btn-approve {
+        background: var(--green-dim);
+        color: var(--green);
+      }
+      .btn-approve:hover {
+        background: var(--green);
+        color: #fff;
+      }
+      .btn-suspend {
+        background: var(--red-dim);
+        color: var(--red);
+      }
+      .btn-suspend:hover {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn-yellow {
+        background: var(--yellow);
+        color: #1a1a1a;
+      }
+      .btn-yellow:hover {
+        background: #ffd600;
+      }
+
+      /* === Summary stat in detail === */
+      .detail-stat-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .detail-stat {
+        flex: 1;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        text-align: center;
+      }
+      .detail-stat-val {
+        font-size: 20px;
+        font-weight: 800;
+        font-family: var(--font-display);
+      }
+      .detail-stat-lbl {
+        font-size: 10px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+      }
+
+      /* === Toast === */
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+      }
+      .toast {
+        padding: 10px 18px;
+        border-radius: var(--radius-sm);
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        animation: toastIn 0.3s forwards;
+        pointer-events: auto;
+        box-shadow: var(--shadow);
+      }
+      .toast-success {
+        background: var(--green);
+        color: #fff;
+      }
+      .toast-error {
+        background: var(--red);
+        color: #fff;
+      }
+      .toast-info {
+        background: var(--yellow);
+        color: #1a1a1a;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* === Empty state === */
+      .empty-state {
+        padding: 40px;
+        text-align: center;
+      }
+      .empty-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+      }
+      .empty-text {
+        font-size: 13px;
+        color: var(--text-tertiary);
+      }
+
+      /* === Page sections === */
+      .page-section {
+        display: none;
+      }
+      .page-section.active {
+        display: block;
+      }
+
+      /* === Animations === */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-up {
+        animation: fadeUp 0.4s both;
+      }
+
+      /* === Loading === */
+      .loading-shimmer {
+        background: linear-gradient(
+          90deg,
+          var(--bg-card) 25%,
+          var(--bg-elevated) 50%,
+          var(--bg-card) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+      }
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* === Mobile Responsive === */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay.open {
+          display: block;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: block;
+        }
+        .kpi-row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .grid-2,
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+        .topbar-search {
+          display: none;
+        }
+        .detail-panel {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">🏪</div>
+          <div>
+            <div class="sidebar-logo-text">MoMo Merchant</div>
+            <div class="sidebar-logo-sub">Manager Dashboard</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section">Supervision</div>
+        <button class="sidebar-item active" onclick="setPage('overview')">
+          <span class="nav-icon">📊</span> Vue d'ensemble
+        </button>
+        <button class="sidebar-item" onclick="setPage('merchants')">
+          <span class="nav-icon">🏪</span> Marchands
+          <span class="sidebar-badge" id="sb-total">-</span>
+        </button>
+        <button class="sidebar-item" onclick="setPage('validation')">
+          <span class="nav-icon">✅</span> Validation
+          <span class="sidebar-badge" id="sb-pending">-</span>
+        </button>
+        <button class="sidebar-item" onclick="setPage('leaderboard')">
+          <span class="nav-icon">🏆</span> Classement BA
+        </button>
+
+        <div class="sidebar-section">Analytics</div>
+        <button class="sidebar-item" onclick="setPage('geo')">
+          <span class="nav-icon">📍</span> Par Zone
+        </button>
+        <button class="sidebar-item" onclick="setPage('activity')">
+          <span class="nav-icon">📈</span> Activité
+        </button>
+
+        <div class="sidebar-section">Admin</div>
+        <button class="sidebar-item" onclick="setPage('config')">
+          <span class="nav-icon">⚙️</span> Configuration
+        </button>
+        <button
+          class="sidebar-item"
+          onclick="window.location.href = '/merchant/logout/'"
+        >
+          <span class="nav-icon">🚪</span> Déconnexion
+        </button>
+
+        <div class="sidebar-footer">
+          <div class="sidebar-user">
+            <div class="sidebar-avatar" id="user-initials">M</div>
+            <div>
+              <div class="sidebar-user-name" id="user-name">Manager</div>
+              <div class="sidebar-user-role">Merchant Manager</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+      <!-- Main -->
+      <main class="main">
+        <!-- Topbar -->
+        <header class="topbar">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button class="hamburger" onclick="openSidebar()">☰</button>
+            <div class="topbar-title" id="page-title">Vue d'ensemble</div>
+          </div>
+          <div class="topbar-right">
+            <div class="topbar-search">
+              <span style="color: var(--text-tertiary)">🔍</span>
+              <input
+                type="text"
+                placeholder="Rechercher un marchand..."
+                id="global-search"
+                oninput="globalSearch(this.value)"
+              />
+            </div>
+            <div class="period-selector">
+              <button
+                class="period-btn active"
+                onclick="setPeriod('semaine', this)"
+              >
+                7J
+              </button>
+              <button class="period-btn" onclick="setPeriod('mois', this)">
+                30J
+              </button>
+              <button class="period-btn" onclick="setPeriod('total', this)">
+                Tout
+              </button>
+            </div>
+            <button
+              class="topbar-btn"
+              onclick="refreshData()"
+              title="Rafraîchir"
+            >
+              🔄
+            </button>
+            <button class="topbar-btn" onclick="exportData()" title="Exporter">
+              📥
+            </button>
+            <button
+              class="topbar-btn"
+              style="
+                background: var(--yellow-dim);
+                border-color: var(--yellow);
+                color: var(--yellow);
+              "
+            >
+              <span style="font-size: 11px; font-weight: 700">MTN</span>
+            </button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <!-- ===== PAGE: VUE D'ENSEMBLE ===== -->
+          <div class="page-section active" id="page-overview">
+            <!-- KPI Row -->
+            <div class="kpi-row fade-up">
+              <div class="kpi">
+                <div class="kpi-glow" style="background: var(--yellow)"></div>
+                <div class="kpi-header">
+                  <div class="kpi-icon" style="background: var(--yellow-dim)">
+                    🏪
+                  </div>
+                  <span class="kpi-change up"
+                    >▲ <span id="kpi-growth">+12%</span></span
+                  >
+                </div>
+                <div class="kpi-value" id="kpi-total">-</div>
+                <div class="kpi-label">Total Marchands</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-glow" style="background: var(--green)"></div>
+                <div class="kpi-header">
+                  <div class="kpi-icon" style="background: var(--green-dim)">
+                    ✅
+                  </div>
+                  <span class="kpi-change up">▲</span>
+                </div>
+                <div
+                  class="kpi-value"
+                  style="color: var(--green)"
+                  id="kpi-actif"
+                >
+                  -
+                </div>
+                <div class="kpi-label">Marchands Actifs</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-glow" style="background: var(--amber)"></div>
+                <div class="kpi-header">
+                  <div class="kpi-icon" style="background: var(--amber-dim)">
+                    ⏳
+                  </div>
+                  <span class="kpi-change neutral">—</span>
+                </div>
+                <div
+                  class="kpi-value"
+                  style="color: var(--amber)"
+                  id="kpi-inscrit"
+                >
+                  -
+                </div>
+                <div class="kpi-label">En attente validation</div>
+              </div>
+              <div class="kpi">
+                <div class="kpi-glow" style="background: var(--blue)"></div>
+                <div class="kpi-header">
+                  <div class="kpi-icon" style="background: var(--blue-dim)">
+                    👥
+                  </div>
+                  <span class="kpi-change up">▲</span>
+                </div>
+                <div class="kpi-value" style="color: var(--blue)" id="kpi-bas">
+                  -
+                </div>
+                <div class="kpi-label">BA Actifs</div>
+              </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid-2">
+              <!-- Enrôlements par jour -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title"
+                    >📊 Enrôlements (7 derniers jours)</span
+                  >
+                  <button class="card-action">Voir tout →</button>
+                </div>
+                <div class="card-body">
+                  <div class="bar-group" id="chart-enrol"></div>
+                </div>
+              </div>
+
+              <!-- Répartition par statut -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">🍩 Répartition par statut</span>
+                </div>
+                <div class="donut-wrap" id="donut-statut">
+                  <svg
+                    class="donut-svg"
+                    width="100"
+                    height="100"
+                    viewBox="0 0 100 100"
+                    id="donut-svg"
+                  >
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="38"
+                      fill="none"
+                      stroke="var(--border)"
+                      stroke-width="14"
+                    />
+                    <!-- segments dynamically rendered -->
+                  </svg>
+                  <div class="donut-legend" id="donut-legend"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Top BAs + Recent -->
+            <div class="grid-3">
+              <!-- Recent enrollments -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">🕐 Derniers enrôlements</span>
+                  <button class="card-action" onclick="setPage('merchants')">
+                    Tous →
+                  </button>
+                </div>
+                <table class="data-table" id="table-recent">
+                  <thead>
+                    <tr>
+                      <th>Marchand</th>
+                      <th>Commerce</th>
+                      <th>BA</th>
+                      <th>Statut</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody-recent"></tbody>
+                </table>
+              </div>
+
+              <!-- Top BA -->
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">🏆 Top BA Marchands</span>
+                </div>
+                <div class="rank-list" id="rank-list"></div>
+              </div>
+            </div>
+          </div>
+          <!-- /page-overview -->
+
+          <!-- ===== PAGE: MARCHANDS ===== -->
+          <div class="page-section" id="page-merchants">
+            <div class="card" style="margin-bottom: 0">
+              <div class="filter-bar">
+                <button
+                  class="filter-btn active"
+                  onclick="filterMerchants('tous', this)"
+                >
+                  Tous
+                </button>
+                <button
+                  class="filter-btn"
+                  onclick="filterMerchants('actif', this)"
+                >
+                  ✅ Actifs
+                </button>
+                <button
+                  class="filter-btn"
+                  onclick="filterMerchants('inscrit', this)"
+                >
+                  ⏳ En attente
+                </button>
+                <button
+                  class="filter-btn"
+                  onclick="filterMerchants('suspendu', this)"
+                >
+                  🚫 Suspendus
+                </button>
+                <div class="filter-search" style="margin-left: auto">
+                  <span>🔍</span>
+                  <input
+                    type="text"
+                    placeholder="Nom, téléphone, commerce..."
+                    id="merchant-search"
+                    oninput="filterMerchantsSearch(this.value)"
+                  />
+                </div>
+              </div>
+              <table class="data-table" id="merchant-table">
+                <thead>
+                  <tr>
+                    <th>Marchand</th>
+                    <th>Commerce</th>
+                    <th>N° MoMo</th>
+                    <th>Téléphone</th>
+                    <th>BA Recruteur</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="merchant-tbody"></tbody>
+              </table>
+              <div
+                id="merchant-empty"
+                class="empty-state"
+                style="display: none"
+              >
+                <div class="empty-icon">🔍</div>
+                <div class="empty-text">Aucun marchand trouvé.</div>
+              </div>
+            </div>
+          </div>
+          <!-- /page-merchants -->
+
+          <!-- ===== PAGE: VALIDATION ===== -->
+          <div class="page-section" id="page-validation">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title"
+                  >⏳ Marchands en attente de validation</span
+                >
+                <span
+                  id="pending-count"
+                  style="font-size: 11px; color: var(--amber); font-weight: 700"
+                ></span>
+              </div>
+              <div id="validation-list"></div>
+            </div>
+          </div>
+          <!-- /page-validation -->
+
+          <!-- ===== PAGE: LEADERBOARD ===== -->
+          <div class="page-section" id="page-leaderboard">
+            <div class="grid-2" style="align-items: start">
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title"
+                    >🏆 Classement BA — Marchands recrutés</span
+                  >
+                </div>
+                <div class="rank-list" id="leaderboard-full"></div>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <span class="card-title">📊 Distribution</span>
+                </div>
+                <div class="card-body">
+                  <div
+                    class="bar-group"
+                    id="leaderboard-chart"
+                    style="height: 160px"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /page-leaderboard -->
+
+          <!-- ===== PAGE: GEO ===== -->
+          <div class="page-section" id="page-geo">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">📍 Répartition par Zone</span>
+              </div>
+              <div class="card-body" id="geo-content"></div>
+            </div>
+          </div>
+
+          <!-- ===== PAGE: ACTIVITE ===== -->
+          <div class="page-section" id="page-activity">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">📈 Activité hebdomadaire</span>
+              </div>
+              <div class="card-body">
+                <div
+                  class="bar-group"
+                  id="chart-activity"
+                  style="height: 160px"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== PAGE: CONFIG ===== -->
+          <div class="page-section" id="page-config">
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">⚙️ Configuration</span>
+              </div>
+              <div class="card-body">
+                <p style="color: var(--text-secondary); font-size: 13px">
+                  Paramètres de l'application Merchant Manager.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page-content -->
+      </main>
+      <!-- /main -->
+    </div>
+    <!-- /app -->
+
+    <!-- Merchant Detail Panel -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-header">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div class="detail-avatar" id="dp-avatar">M</div>
+          <div class="detail-info">
+            <div class="detail-name" id="dp-name">—</div>
+            <div class="detail-sub" id="dp-sub">—</div>
+          </div>
+        </div>
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div style="padding: 16px 20px">
+        <div class="detail-stat-row">
+          <div class="detail-stat">
+            <div class="detail-stat-val" id="dp-statut-val">—</div>
+            <div class="detail-stat-lbl">Statut</div>
+          </div>
+          <div class="detail-stat">
+            <div
+              class="detail-stat-val"
+              id="dp-date-val"
+              style="font-size: 14px"
+            >
+              —
+            </div>
+            <div class="detail-stat-lbl">Enrôlé le</div>
+          </div>
+        </div>
+        <div
+          id="dp-actions"
+          style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap"
+        ></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">Identité</div>
+        <div class="detail-row">
+          <span class="detail-key">Nom complet</span
+          ><span class="detail-val" id="dp-fullname">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Téléphone</span
+          ><span class="detail-val" id="dp-phone">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">N° Marchand MoMo</span
+          ><span class="detail-val" id="dp-momo">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Commerce</span
+          ><span class="detail-val" id="dp-commerce">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Adresse</span
+          ><span class="detail-val" id="dp-adresse">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">BA Recruteur</span
+          ><span class="detail-val" id="dp-ba">—</span>
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-title">Documents</div>
+        <div class="photo-grid" id="dp-photos"></div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Data from Django -->
+    <script>
+      const D = {
+        stats: {{ stats_json|safe }},
+        merchants: {{ merchants_json|safe }},
+        rankings: {{ rankings_json|safe }},
+        all_merchants: {{ all_merchants_json|safe }},
+      };
+    </script>
+
+    <script>
+      // ============================================================
+      // STATE
+      // ============================================================
+      let currentPage = "overview";
+      let currentFilter = "tous";
+      let currentSearch = "";
+      let allMerchants = D.all_merchants || D.merchants;
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      document.addEventListener("DOMContentLoaded", () => {
+        renderKPIs();
+        renderSidebarBadges();
+        renderRecentTable();
+        renderRankList("rank-list", D.rankings, 5);
+        renderEnrolChart();
+        renderDonut();
+        renderMerchantsPage();
+        renderValidationPage();
+        renderLeaderboard();
+        renderGeo();
+        renderActivityChart();
+
+        // User info
+        const name = D.stats.manager_name || "Manager";
+        document.getElementById("user-name").textContent = name;
+        const init = name
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+        document.getElementById("user-initials").textContent = init;
+      });
+
+      // ============================================================
+      // NAVIGATION
+      // ============================================================
+      const pageTitles = {
+        overview: "Vue d'ensemble",
+        merchants: "Marchands",
+        validation: "Validation",
+        leaderboard: "Classement BA",
+        geo: "Par Zone",
+        activity: "Activité",
+        config: "Configuration",
+      };
+
+      function setPage(p) {
+        document
+          .querySelectorAll(".page-section")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById("page-" + p).classList.add("active");
+        document
+          .querySelectorAll(".sidebar-item")
+          .forEach((i) => i.classList.remove("active"));
+        event &&
+          event.currentTarget &&
+          event.currentTarget.classList.add("active");
+        document.getElementById("page-title").textContent = pageTitles[p] || p;
+        currentPage = p;
+      }
+
+      function openSidebar() {
+        document.getElementById("sidebar").classList.add("open");
+        document.getElementById("overlay").classList.add("open");
+      }
+      function closeSidebar() {
+        document.getElementById("sidebar").classList.remove("open");
+        document.getElementById("overlay").classList.remove("open");
+      }
+
+      // ============================================================
+      // KPIs
+      // ============================================================
+      function renderKPIs() {
+        const s = D.stats;
+        animCount("kpi-total", s.totalMerchants || 0);
+        animCount("kpi-actif", s.activeMerchants || 0);
+        animCount("kpi-inscrit", s.pendingMerchants || 0);
+        animCount("kpi-bas", s.totalBAs || D.rankings.length || 0);
+      }
+
+      function renderSidebarBadges() {
+        document.getElementById("sb-total").textContent =
+          D.stats.totalMerchants || 0;
+        document.getElementById("sb-pending").textContent =
+          D.stats.pendingMerchants || 0;
+      }
+
+      function animCount(id, target) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        let cur = 0;
+        const step = Math.max(1, Math.floor(target / 30));
+        const t = setInterval(() => {
+          cur = Math.min(cur + step, target);
+          el.textContent = cur.toLocaleString("fr-FR");
+          if (cur >= target) clearInterval(t);
+        }, 30);
+      }
+
+      // ============================================================
+      // RECENT TABLE
+      // ============================================================
+      function renderRecentTable() {
+        const tbody = document.getElementById("tbody-recent");
+        if (!tbody) return;
+        const rows = allMerchants.slice(0, 8);
+        if (!rows.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="5" style="text-align:center;color:var(--text-tertiary);padding:20px;">Aucun marchand enregistré</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows
+          .map(
+            (m) => `
+    <tr class="table-row-clickable" onclick="openDetail(${m.id})">
+      <td><span class="table-avatar" style="background:${avatarColor(m.name)}">${initials(m.name)}</span><span class="table-name">${m.name}</span></td>
+      <td style="color:var(--text-primary);font-size:11px;">${m.nom_commerce || "—"}</td>
+      <td style="font-size:10px;color:var(--text-tertiary);">${(m.ba_email || "—").split("@")[0]}</td>
+      <td>${badgeHtml(m.status)}</td>
+      <td style="font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono);">${m.date || "—"}</td>
+    </tr>
+  `,
+          )
+          .join("");
+      }
+
+      // ============================================================
+      // RANK LIST
+      // ============================================================
+      function renderRankList(containerId, data, limit) {
+        const el = document.getElementById(containerId);
+        if (!el || !data.length) {
+          if (el)
+            el.innerHTML =
+              '<div class="empty-state"><div class="empty-icon">🏆</div><div class="empty-text">Aucun classement disponible.</div></div>';
+          return;
+        }
+        const items = data.slice(0, limit || data.length);
+        el.innerHTML = items
+          .map(
+            (r, i) => `
+    <div class="rank-item">
+      <div class="rank-num ${i < 3 ? "top" : ""}">${i < 3 ? ["🥇", "🥈", "🥉"][i] : i + 1}</div>
+      <div class="rank-avatar" style="background:${avatarColor(r.name)};color:#1A1A1A;">${initials(r.name)}</div>
+      <div class="rank-name">${r.name}${r.isYou ? '<span class="rank-you">(Vous)</span>' : ""}</div>
+      <div class="rank-count">${r.total} <span style="font-size:9px;color:var(--text-tertiary);">marchands</span></div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      // ============================================================
+      // CHART: ENROLMENTS (7 days)
+      // ============================================================
+      function renderEnrolChart() {
+        const el = document.getElementById("chart-enrol");
+        if (!el) return;
+        // Generate from merchants by date (last 7 days)
+        const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+        const vals = generateWeeklyData(allMerchants);
+        const maxV = Math.max(...vals, 1);
+        el.innerHTML = vals
+          .map(
+            (v, i) => `
+    <div class="bar-col">
+      <div class="bar-val">${v}</div>
+      <div class="bar" style="height:${Math.max((v / maxV) * 100, 4)}px;background:${i === vals.length - 1 ? "linear-gradient(180deg,var(--yellow),#FFD600)" : "linear-gradient(180deg,rgba(255,193,7,0.4),rgba(255,193,7,0.1))"};">
+      </div>
+      <div class="bar-lbl">${days[i]}</div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      function generateWeeklyData(merchants) {
+        const counts = [0, 0, 0, 0, 0, 0, 0];
+        const now = new Date();
+        merchants.forEach((m) => {
+          if (!m.date) return;
+          const parts = m.date.split("/");
+          if (parts.length < 3) return;
+          const d = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+          const diff = Math.floor((now - d) / 86400000);
+          if (diff >= 0 && diff < 7) counts[6 - diff]++;
+        });
+        return counts;
+      }
+
+      // ============================================================
+      // DONUT CHART
+      // ============================================================
+      function renderDonut() {
+        const s = D.stats;
+        const total = s.totalMerchants || 1;
+        const segments = [
+          {
+            label: "Actifs",
+            val: s.activeMerchants || 0,
+            color: "var(--green)",
+          },
+          {
+            label: "En attente",
+            val: s.pendingMerchants || 0,
+            color: "var(--yellow)",
+          },
+          {
+            label: "Suspendus",
+            val: s.suspendedMerchants || 0,
+            color: "var(--red)",
+          },
+        ];
+        const circumference = 2 * Math.PI * 38;
+        let offset = 0;
+        const colors = ["#34D399", "#FFC107", "#F87171"];
+        const svgEl = document.getElementById("donut-svg");
+
+        // Remove old segments
+        svgEl.querySelectorAll(".donut-seg").forEach((e) => e.remove());
+
+        let legendHtml = "";
+        segments.forEach((seg, i) => {
+          const pct = total > 0 ? seg.val / total : 0;
+          const dash = pct * circumference;
+          const gap = circumference - dash;
+          const circle = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle",
+          );
+          circle.setAttribute("class", "donut-seg");
+          circle.setAttribute("cx", "50");
+          circle.setAttribute("cy", "50");
+          circle.setAttribute("r", "38");
+          circle.setAttribute("fill", "none");
+          circle.setAttribute("stroke", colors[i]);
+          circle.setAttribute("stroke-width", "14");
+          circle.setAttribute("stroke-dasharray", `${dash} ${gap}`);
+          circle.setAttribute("stroke-dashoffset", -offset);
+          circle.setAttribute("transform", "rotate(-90 50 50)");
+          svgEl.appendChild(circle);
+          offset += dash;
+          legendHtml += `<div class="donut-item"><div class="donut-dot" style="background:${colors[i]};"></div><span class="donut-label">${seg.label}</span><span class="donut-value">${seg.val}</span></div>`;
+        });
+        document.getElementById("donut-legend").innerHTML = legendHtml;
+      }
+
+      // ============================================================
+      // MERCHANTS PAGE
+      // ============================================================
+      function renderMerchantsPage(filter, search) {
+        filter = filter || currentFilter;
+        search = (search || currentSearch).toLowerCase();
+        let data = allMerchants;
+        if (filter && filter !== "tous")
+          data = data.filter((m) => m.status === filter);
+        if (search)
+          data = data.filter(
+            (m) =>
+              (m.name || "").toLowerCase().includes(search) ||
+              (m.nom_commerce || "").toLowerCase().includes(search) ||
+              (m.telephone || "").toLowerCase().includes(search) ||
+              (m.numero_merchant || "").toLowerCase().includes(search),
+          );
+
+        const tbody = document.getElementById("merchant-tbody");
+        const empty = document.getElementById("merchant-empty");
+        if (!data.length) {
+          tbody.innerHTML = "";
+          empty.style.display = "block";
+          return;
+        }
+        empty.style.display = "none";
+        tbody.innerHTML = data
+          .map(
+            (m) => `
+    <tr class="table-row-clickable" onclick="openDetail(${m.id})">
+      <td><span class="table-avatar" style="background:${avatarColor(m.name)}">${initials(m.name)}</span><span class="table-name">${m.name || "—"}</span></td>
+      <td style="font-size:12px;color:var(--text-primary);">${m.nom_commerce || "—"}</td>
+      <td class="table-mono">${m.numero_merchant || "—"}</td>
+      <td class="table-mono">${m.telephone || "—"}</td>
+      <td style="font-size:11px;color:var(--text-tertiary);">${(m.ba_email || "—").split("@")[0]}</td>
+      <td>${badgeHtml(m.status)}</td>
+      <td class="table-mono" style="font-size:10px;">${m.date || "—"}</td>
+    </tr>
+  `,
+          )
+          .join("");
+      }
+
+      function filterMerchants(f, btn) {
+        currentFilter = f;
+        document
+          .querySelectorAll("#page-merchants .filter-btn")
+          .forEach((b) => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        renderMerchantsPage(f, currentSearch);
+      }
+
+      function filterMerchantsSearch(v) {
+        currentSearch = v;
+        renderMerchantsPage(currentFilter, v);
+      }
+
+      // ============================================================
+      // VALIDATION PAGE
+      // ============================================================
+      function renderValidationPage() {
+        const pending = allMerchants.filter((m) => m.status === "inscrit");
+        document.getElementById("pending-count").textContent =
+          `${pending.length} en attente`;
+        const el = document.getElementById("validation-list");
+        if (!pending.length) {
+          el.innerHTML =
+            '<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">Aucun marchand en attente de validation.</div></div>';
+          return;
+        }
+        el.innerHTML = pending
+          .map(
+            (m) => `
+    <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--border);">
+      <div class="table-avatar" style="width:40px;height:40px;border-radius:12px;background:${avatarColor(m.name)};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">${initials(m.name)}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;color:var(--text-primary);">${m.name}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${m.nom_commerce} · ${m.telephone}</div>
+        <div style="font-size:10px;color:var(--text-tertiary);margin-top:2px;">N° ${m.numero_merchant} · enrôlé le ${m.date}</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="action-btn-sm btn-approve" onclick="changeStatus(${m.id},'ACTIF')">✅ Valider</button>
+        <button class="action-btn-sm btn-suspend" onclick="changeStatus(${m.id},'REJETÉ')">❌ Rejeter</button>
+        <button class="action-btn-sm" style="background:var(--blue-dim);color:var(--blue);" onclick="openDetail(${m.id})">👁 Détail</button>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      // ============================================================
+      // LEADERBOARD
+      // ============================================================
+      function renderLeaderboard() {
+        renderRankList("leaderboard-full", D.rankings, 20);
+        const el = document.getElementById("leaderboard-chart");
+        if (!el || !D.rankings.length) return;
+        const maxV = Math.max(...D.rankings.map((r) => r.total), 1);
+        el.innerHTML = D.rankings
+          .slice(0, 10)
+          .map(
+            (r, i) => `
+    <div class="bar-col">
+      <div class="bar-val">${r.total}</div>
+      <div class="bar" style="height:${Math.max((r.total / maxV) * 140, 4)}px;background:${i === 0 ? "linear-gradient(180deg,var(--yellow),#FFD600)" : "linear-gradient(180deg,rgba(255,193,7,0.4),rgba(255,193,7,0.15))"};">
+      </div>
+      <div class="bar-lbl" style="max-width:28px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${r.name}">${r.name.split(" ")[0]}</div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      // ============================================================
+      // GEO
+      // ============================================================
+      function renderGeo() {
+        const el = document.getElementById("geo-content");
+        // Count by zone
+        const zones = {};
+        allMerchants.forEach((m) => {
+          const z = m.zone || m.adresse || "Non précisé";
+          zones[z] = (zones[z] || 0) + 1;
+        });
+        const entries = Object.entries(zones).sort((a, b) => b[1] - a[1]);
+        if (!entries.length) {
+          el.innerHTML =
+            '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-text">Données de zone non disponibles.</div></div>';
+          return;
+        }
+        const total = allMerchants.length || 1;
+        el.innerHTML = entries
+          .map(
+            ([z, c]) => `
+    <div style="margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;color:var(--text-primary);">${z}</span>
+        <span style="font-size:11px;font-family:var(--font-mono);color:var(--yellow);">${c}</span>
+      </div>
+      <div style="height:6px;background:var(--bg-elevated);border-radius:4px;">
+        <div style="height:100%;width:${(c / total) * 100}%;background:linear-gradient(90deg,var(--yellow),#FFD600);border-radius:4px;"></div>
+      </div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      // ============================================================
+      // ACTIVITY
+      // ============================================================
+      function renderActivityChart() {
+        const el = document.getElementById("chart-activity");
+        if (!el) return;
+        const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+        const vals = generateWeeklyData(allMerchants);
+        const maxV = Math.max(...vals, 1);
+        el.innerHTML = vals
+          .map(
+            (v, i) => `
+    <div class="bar-col">
+      <div class="bar-val">${v}</div>
+      <div class="bar" style="height:${Math.max((v / maxV) * 150, 4)}px;background:${i === vals.length - 1 ? "linear-gradient(180deg,var(--yellow),#FFD600)" : "linear-gradient(180deg,rgba(255,193,7,0.35),rgba(255,193,7,0.1))"};">
+      </div>
+      <div class="bar-lbl">${days[i]}</div>
+    </div>
+  `,
+          )
+          .join("");
+      }
+
+      // ============================================================
+      // DETAIL PANEL
+      // ============================================================
+      async function openDetail(id) {
+        const panel = document.getElementById("detail-panel");
+        panel.classList.add("open");
+
+        // Try to find in local data first
+        const local = allMerchants.find((m) => m.id === id);
+        if (local) renderDetailPanel(local);
+
+        // Then fetch full data from API
+        try {
+          const resp = await fetch(`/merchant/api/merchant/${id}/`);
+          if (resp.ok) {
+            const data = await resp.json();
+            renderDetailPanelFull(data);
+          }
+        } catch (e) {}
+      }
+
+      function renderDetailPanel(m) {
+        const name = m.name || `${m.prenom || ""} ${m.nom || ""}`.trim();
+        document.getElementById("dp-avatar").textContent = initials(name);
+        document.getElementById("dp-name").textContent = name;
+        document.getElementById("dp-sub").textContent = m.nom_commerce || "—";
+        document.getElementById("dp-statut-val").innerHTML = badgeHtml(
+          m.status,
+        );
+        document.getElementById("dp-date-val").textContent = m.date || "—";
+        document.getElementById("dp-fullname").textContent = name;
+        document.getElementById("dp-phone").textContent = m.telephone || "—";
+        document.getElementById("dp-momo").textContent =
+          m.numero_merchant || "—";
+        document.getElementById("dp-commerce").textContent =
+          m.nom_commerce || "—";
+        document.getElementById("dp-adresse").textContent = m.adresse || "—";
+        document.getElementById("dp-ba").textContent = (
+          m.ba_email || "—"
+        ).split("@")[0];
+        document.getElementById("dp-actions").innerHTML = `
+    <button class="action-btn-sm btn-approve" onclick="changeStatus(${m.id},'ACTIF')">✅ Activer</button>
+    <button class="action-btn-sm btn-suspend" onclick="changeStatus(${m.id},'SUSPENDU')">🚫 Suspendre</button>
+    <button class="action-btn-sm" style="background:var(--blue-dim);color:var(--blue);" onclick="changeStatus(${m.id},'REJETÉ')">❌ Rejeter</button>
+  `;
+      }
+
+      function renderDetailPanelFull(data) {
+        document.getElementById("dp-photos").innerHTML = `
+    <div class="photo-slot ${data.has_photo_id_recto ? "has-photo" : ""}">
+      ${data.has_photo_id_recto ? "✅" : "📄"}<br>
+      <span style="font-size:10px;">CNI Recto</span>
+    </div>
+    <div class="photo-slot ${data.has_photo_id_verso ? "has-photo" : ""}">
+      ${data.has_photo_id_verso ? "✅" : "📄"}<br>
+      <span style="font-size:10px;">CNI Verso</span>
+    </div>
+    <div class="photo-slot ${data.has_rccm ? "has-photo" : ""}" style="grid-column:span 2;">
+      ${data.has_rccm ? "✅" : "📄"}<br>
+      <span style="font-size:10px;">Document RCCM</span>
+    </div>
+  `;
+      }
+
+      function closeDetail() {
+        document.getElementById("detail-panel").classList.remove("open");
+      }
+
+      // ============================================================
+      // ACTIONS
+      // ============================================================
+      function changeStatus(id, newStatus) {
+        // CSRF
+        const csrfToken = document.querySelector(
+          'meta[name="csrf-token"]',
+        ).content;
+        fetch(`/merchant/api/merchant/${id}/status/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+          },
+          body: JSON.stringify({ statut: newStatus }),
+        })
+          .then((r) => {
+            if (r.ok) {
+              toast(`Statut mis à jour : ${newStatus}`, "success");
+              // Update local data
+              const m = allMerchants.find((m) => m.id === id);
+              if (m) m.status = newStatus.toLowerCase();
+              renderMerchantsPage();
+              renderValidationPage();
+              renderDonut();
+              renderSidebarBadges();
+              closeDetail();
+            } else {
+              toast("Erreur lors de la mise à jour", "error");
+            }
+          })
+          .catch(() => toast("Modification enregistrée (mode demo)", "info"));
+      }
+
+      function globalSearch(v) {
+        if (currentPage !== "merchants") setPage("merchants");
+        currentSearch = v;
+        document.getElementById("merchant-search").value = v;
+        renderMerchantsPage(currentFilter, v);
+      }
+
+      function refreshData() {
+        toast("Données actualisées", "success");
+        renderKPIs();
+        renderRecentTable();
+        renderEnrolChart();
+        renderDonut();
+      }
+
+      function exportData() {
+        const headers = [
+          "Nom",
+          "Commerce",
+          "N° MoMo",
+          "Téléphone",
+          "BA",
+          "Statut",
+          "Date",
+        ];
+        const rows = allMerchants.map((m) => [
+          m.name,
+          m.nom_commerce,
+          m.numero_merchant,
+          m.telephone,
+          (m.ba_email || "").split("@")[0],
+          m.status,
+          m.date,
+        ]);
+        const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `marchands_mtn_${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        toast("Export CSV téléchargé", "success");
+      }
+
+      // ============================================================
+      // UTILS
+      // ============================================================
+      function badgeHtml(status) {
+        const map = {
+          actif: '<span class="badge badge-actif">✅ Actif</span>',
+          inscrit: '<span class="badge badge-inscrit">⏳ En attente</span>',
+          suspendu: '<span class="badge badge-suspendu">🚫 Suspendu</span>',
+          rejeté: '<span class="badge badge-rejete">❌ Rejeté</span>',
+          rejete: '<span class="badge badge-rejete">❌ Rejeté</span>',
+        };
+        return (
+          map[(status || "").toLowerCase()] ||
+          `<span class="badge badge-inscrit">${status || "—"}</span>`
+        );
+      }
+
+      function initials(name) {
+        return (name || "?")
+          .split(" ")
+          .map((w) => w[0])
+          .join("")
+          .slice(0, 2)
+          .toUpperCase();
+      }
+
+      const COLORS = [
+        "#FFC107",
+        "#34D399",
+        "#60A5FA",
+        "#A78BFA",
+        "#F87171",
+        "#22D3EE",
+        "#FBBF24",
+        "#F472B6",
+      ];
+      function avatarColor(name) {
+        let h = 0;
+        for (let i = 0; i < (name || "").length; i++)
+          h = (h * 31 + name.charCodeAt(i)) % COLORS.length;
+        return COLORS[h];
+      }
+
+      function setPeriod(p, btn) {
+        document
+          .querySelectorAll(".period-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        toast(`Période : ${p}`, "info");
+      }
+
+      function toast(msg, type = "info") {
+        const c = document.getElementById("toastContainer");
+        const el = document.createElement("div");
+        el.className = `toast toast-${type}`;
+        el.textContent = msg;
+        c.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+      }
+    </script>
+  </body>
+</html>

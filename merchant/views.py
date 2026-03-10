@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 from .services import (
     get_merchant_stats, get_recent_merchants,
@@ -103,3 +104,81 @@ def merchant_detail_api(request, merchant_id):
         "has_rccm": bool(m.photo_rccm),
         "date": m.created_at.strftime("%d/%m/%Y %H:%M") if m.created_at else "",
     })
+
+
+# ─────────────────────────────────────────────
+# NOUVELLES VUES — Merchant Manager Dashboard
+# ─────────────────────────────────────────────
+
+@login_required(login_url="/merchant/")
+def merchant_dashboard(request):
+    """Dashboard manager : supervision globale de tous les marchands."""
+    from .models import Merchant
+    from core.models_legacy import BrandAmbassadors
+
+    # Tous les marchands (vue admin complète)
+    all_merchants_qs = Merchant.objects.all().order_by("-created_at")[:200]
+    all_merchants = []
+    for m in all_merchants_qs:
+        all_merchants.append({
+            "id": m.id,
+            "nom": m.nom,
+            "prenom": m.prenom,
+            "name": f"{m.prenom} {m.nom}".strip(),
+            "telephone": m.telephone,
+            "adresse": m.adresse,
+            "numero_merchant": m.numero_merchant,
+            "nom_commerce": m.nom_commerce,
+            "status": m.statut.lower(),
+            "ba_email": m.ba_email,
+            "date": m.created_at.strftime("%d/%m/%Y") if m.created_at else "",
+            "has_photo_id": bool(m.photo_id_recto),
+            "has_rccm": bool(m.photo_rccm),
+        })
+
+    # Stats globales
+    stats = {
+        "totalMerchants": Merchant.objects.count(),
+        "activeMerchants": Merchant.objects.filter(statut="ACTIF").count(),
+        "pendingMerchants": Merchant.objects.filter(statut="INSCRIT").count(),
+        "suspendedMerchants": Merchant.objects.filter(statut="SUSPENDU").count(),
+        "totalBAs": BrandAmbassadors.objects.filter(statut__in=["ACTIF", "ACTIVE"]).count(),
+        "manager_name": request.user.get_full_name() or request.user.username,
+    }
+
+    # Classement BA
+    leaderboard = get_merchant_leaderboard()
+    rankings_json = [
+        {"name": item["name"], "total": item["total_merchants"], "isYou": False}
+        for item in leaderboard
+    ]
+
+    ctx = {
+        "stats_json": json.dumps(stats),
+        "all_merchants_json": json.dumps(all_merchants),
+        "merchants_json": json.dumps([]),
+        "rankings_json": json.dumps(rankings_json),
+    }
+    return render(request, "merchant/dashboard.html", ctx)
+
+
+@login_required(login_url="/merchant/")
+@require_POST
+def update_merchant_status(request, merchant_id):
+    """API: Changer le statut d'un marchand (activer / suspendre / rejeter)."""
+    from .models import Merchant
+
+    try:
+        data = json.loads(request.body)
+        new_statut = data.get("statut", "").upper()
+        valid_statuts = ["ACTIF", "INSCRIT", "SUSPENDU", "REJETÉ"]
+        if new_statut not in valid_statuts:
+            return JsonResponse({"error": "Statut invalide"}, status=400)
+        m = Merchant.objects.get(id=merchant_id)
+        m.statut = new_statut
+        m.save()
+        return JsonResponse({"success": True, "statut": m.statut})
+    except Merchant.DoesNotExist:
+        return JsonResponse({"error": "Marchand introuvable"}, status=404)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
